@@ -1,0 +1,2022 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://kit.fontawesome.com/7a312fc647.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="../../../../base.css">
+    <link rel="stylesheet" type="text/css" href="../../../../article.css">
+    <link rel="stylesheet" type="text/css" href="../../../../menu.js">
+</head>
+<body>
+    <div class="menu" id="mymenu">
+        <div class="profileCard">
+            <img src="../../../../selfie.jpg" alt="Michel" class="photo">
+            <h1>Michel Oliveira e Oliveira</h1>
+            <div class="title">
+                <p>
+                    Arquiteto&<br>
+                    Engenheiro de Sistemas&<br>
+                    Programador&<br>
+                    .NET
+                </p>
+            </div>
+            <div class="at">
+                <p>@ Banco Safra</p>
+            </div>
+            <div class="social">
+                <a href="https://br.linkedin.com/in/michel-oliveira-arquitetura-ti" target="_blank"><span><i class="fab fa-linkedin"></i></span></a>
+                <a href="https://github.com/oliveira-michel" target="_blank"><span><i class="fab fa-github"></i></span></a>
+            </div>
+        </div>
+        <div class="links">
+            <div class="home">
+                <a href="../../../../index.htm" class="active">Home</a>
+            </div>
+            <div class="hashTags"><a href='../../../../index.htm#rest' onclick="filterHashTag('rest')">#rest</a></div>
+        </div>
+    </div>
+    <div class="content"><h1 id="guia-de-design-rest"><a id="guia-de-design-rest"></a>Guia de Design REST</h1>
+<h2 id="abstract"><em><a id="abstract"></a>Abstract</em></h2>
+<p><em>This document is a guideline for REST API designing based on the best practices and experiences from author who headed some REST API service governance projects in the banking environment. REST API is an architectural style used to expose services on the web.</em></p>
+<p>Este documento é guia para design de REST API com base em melhores práticas e experiências do autor que liderou alguns projetos de governança de serviços com REST API em ambiente bancário. REST API é um estilo arquitetural usado para expor serviços na web.</p>
+<h2 id="status-of-this-document"><em><a id="status-of-this-document"></a>Status of this document</em></h2>
+<p><em>This is an &quot;alive&quot; document where the author is updating with day-by-day experience. Therefore, it may never arrive in its final version. However, the published content already accumulates project experiences that totaled a few hundred REST APIs.</em></p>
+<p>Este é um documento &quot;vivo&quot; em que o autor está atualizando com a experiência do dia a dia. Portanto, nunca pode chegar em sua versão final. No entanto, o conteúdo publicado já acumula experiências de projetos que totalizaram algumas centenas de REST APIs.</p>
+<h2 id="conteudo"><a id="conte&#250;do"></a>Conteúdo</h2>
+<ul>
+<li><a href="#introdu%C3%A7%C3%A3o-e-conceitos-b%C3%A1sicos">Introdução e conceitos básicos</a></li>
+<li><a href="#request">Request</a>
+<ul>
+<li><a href="#request--url">URL</a>
+<ul>
+<li><a href="#request--url--base">Base</a></li>
+<li><a href="#request--url--resources">Resources</a>
+<ul>
+<li><a href="#request--url--resources--fun%C3%A7%C3%B5es-que-n%C3%A3o-s%C3%A3o-crud">Funções que não são CRUD</a></li>
+</ul>
+</li>
+<li><a href="#request--url--resources--dom%C3%ADnios-funcionais">Domínios Funcionais</a></li>
+<li><a href="#request--url--resources--path-parameters">Path Parameters</a></li>
+<li><a href="#request--url--query-strings">Query Strings</a>
+<ul>
+<li><a href="#request--url--query-strings--full-text-search">Full text search</a></li>
+<li><a href="#request--url--query-strings--pagina%C3%A7%C3%A3o">Paginação</a>
+<ul>
+<li><a href="#request--url--query-strings--pagina%C3%A7%C3%A3o--range">Range</a></li>
+<li><a href="#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-limit">Page e Limit</a></li>
+<li><a href="#request--url--query-strings--pagina%C3%A7%C3%A3o--top">Top</a></li>
+</ul>
+</li>
+<li><a href="#request--url--query-strings--ordena%C3%A7%C3%A3o">Ordenação</a></li>
+<li><a href="#request--url--query-strings--fields">Fields</a></li>
+<li><a href="#request--url--query-strings--views">Views</a></li>
+<li><a href="#request--url--query-strings--expand">Expand</a></li>
+</ul>
+</li>
+<li><a href="#request--url--alias">Alias</a></li>
+</ul>
+</li>
+<li><a href="#request--headers">Headers</a>
+<ul>
+<li><a href="#request--headers--content-type">Content-Type</a></li>
+<li><a href="#request--headers--accept">Accept</a></li>
+<li><a href="#request--headers--correlation-id">Correlation ID</a></li>
+</ul>
+</li>
+<li><a href="#request--verbs">Verbs</a>
+<ul>
+<li><a href="#request--verbs--get">GET</a></li>
+<li><a href="#request--verbs--post">POST</a></li>
+<li><a href="#request--verbs--put">PUT</a></li>
+<li><a href="#request--verbs--patch">PATCH</a></li>
+<li><a href="#request--verbs--delete">DELETE</a></li>
+</ul>
+</li>
+<li><a href="#request--body">Body</a></li>
+</ul>
+</li>
+<li><a href="#response">Response</a>
+<ul>
+<li><a href="#response--headers">Headers</a>
+<ul>
+<li><a href="#response--headers--content-type">Content-Type</a></li>
+<li><a href="#response--headers--content-location">Content-Location</a></li>
+<li><a href="#response--headers--location">Location</a></li>
+</ul>
+</li>
+<li><a href="#response--body">Body</a>
+<ul>
+<li><a href="#response--body--envelope-data">Envelope &quot;Data&quot;</a></li>
+<li><a href="#response--body--recurso-unit%C3%A1rio-array-ou-nenhum">Recurso unitário, array ou nenhum</a></li>
+<li><a href="#response--body--full-text-search">Full text search</a></li>
+<li><a href="#response--body--pagina%C3%A7%C3%A3o">Paginação</a>
+<ul>
+<li><a href="#response--body--pagina%C3%A7%C3%A3o--range">Range</a></li>
+<li><a href="#response--body--pagina%C3%A7%C3%A3o--page-e-limit">Page e Limit</a></li>
+<li><a href="#response--body--pagina%C3%A7%C3%A3o--top">Top</a></li>
+</ul>
+</li>
+<li><a href="#response--body--ordena%C3%A7%C3%A3o">Ordenação</a></li>
+<li><a href="#response--body--fields">Fields</a></li>
+<li><a href="#response--body--views">Views</a></li>
+<li><a href="#response--body--expand">Expand</a></li>
+<li><a href="#response--body--errors-e-warnings">Errors e Warnings</a></li>
+<li><a href="#response--body--hateoas">HATEOAS</a></li>
+</ul>
+</li>
+<li><a href="#response--http-status-codes">HTTP Status Code</a></li>
+<li><a href="#response--exemplos-de-uso-dos-http-status-codes">Exemplos de uso dos HTTP Status Codes</a></li>
+</ul>
+</li>
+<li><a href="#tipos-de-dados">Tipos de dados</a></li>
+<li><a href="#processamento-ass%C3%ADncrono">Processamento assíncrono</a></li>
+<li><a href="#processamento-em-lotes">Processamento em lotes</a></li>
+<li><a href="#recursividade">Recursividade</a></li>
+<li><a href="#versionamento">Versionamento</a></li>
+<li><a href="#transfer%C3%AAncia-de-arquivos">Transferência de arquivos</a></li>
+<li><a href="#seguran%C3%A7a">Segurança</a></li>
+<li><a href="#performance-cache-e-compress%C3%A3o">Performance, Cache e compressão</a></li>
+<li><a href="#palavras-finais">Palavras Finais</a></li>
+</ul>
+<h2 id="introducao-e-conceitos-basicos"><a id="introdu&#231;&#227;o-e-conceitos-b&#225;sicos"></a>Introdução e conceitos básicos</h2>
+<p>Os conteúdos abaixo cobrem alguns conceitos aliados às boas práticas no design de RESTful APIs. Quando falamos em design de RESTful APIs, estamos abordando como definir um contrato de API que expõe as entidades e funções de um determinado sistema respeitando as restrições do REST.</p>
+<blockquote>
+<p>Para fazer o entendimento das necessidades de negócio e definição das entidades, recomendamos o uso de Domain Driven Design.
+TO DO: Em breve será disponibilizado um guia explorando toda a fase de entendimento e transformação dos conceitos de negócio em entidades para serem expostas como recursos via REST API.</p>
+</blockquote>
+<blockquote>
+<p>O conteúdo deste material contempla os conceitos para especificação do contrato de REST APIs de forma genérica, não abordando necessariamente nenhuma linguagem específica de definição de contrato: como RAML, Open API etc.
+TO DO: Em breve serão disponibilizados exemplos dos conceitos deste guia em uma destas linguagens.</p>
+</blockquote>
+<p><strong>API</strong> (<strong>A</strong>pplication <strong>P</strong>rogramming <strong>I</strong>nterface) é um software que permite comunicação entre sistemas onde há um fornecedor e um ou mais consumidores de informação, serviços etc.  Para consumir uma API respeita-se um contrato que deve incluir o protocolo de comunicação, as operações (consultas e atualizações) e os formatos de dados para entradas, saídas e erros.
+A maioria dos softwares nos quais nós interagimos são construídos para atender às necessidades humanas e normalmente referenciam as &quot;coisas&quot; reais das quais esses softwares tratam. Por exemplo, um software de biblioteca vai representar livros, seções, autores etc. e, através de alguma interface, permitir que um usuário interaja com estas representações. Uma API difere-se deste tipo de software no que tange o usuário: quem interage com o software é outro software, não diretamente o usuário final. No entanto, quem desenvolve o software que interage com a API é um programador - e até a data deste documento, a maioria ainda são humanos - e para que a experiência deste usuário programador e do usuário do software que ele desenvolve seja a melhor possível, princípios de design devem ser respeitados.</p>
+<p><strong>REST API</strong> (<strong>R</strong>epresentational <strong>S</strong>tate <strong>T</strong>ransfer <strong>A</strong>pplication <strong>P</strong>rogramming <strong>I</strong>nterface) é um estilo de arquitetura que define um conjunto de restrições e propriedades baseadas em HTTP fornecendo interoperabilidade entre sistemas de computadores na internet (ou rede local). REST permite que os sistemas consumidores acessem e manipulem o estado de representações textuais de recursos usando um conjunto pré definido de operações. As &quot;coisas&quot; da vida real em REST se chamam recursos. O conjunto de valores dos atributos de um determinado recurso em um determinado momento, se chama estado.
+Por colocar mais restrições do que WebServices - que é uma outra forma de integrar sistemas - e utilizar mais recursos do HTTP do que WebServices, acabou padronizando melhor a forma de comunicação e isso agilizou o desenvolvimento das integrações.
+O REST enfatiza simplicidade, extensibilidade, confiabilidade e performance:</p>
+<ul>
+<li><strong>Simplicidade</strong> porque a forma como se interage com REST APIs é bem definida e de certa forma restritiva e a interação é stateless, ou seja, todas as informações necessárias para o processamento de uma requisição (no REST, alteração do estado de um recurso) deve estar contida naquela requisição.</li>
+<li><strong>Extensibilidade</strong> porque um determinado recurso pode ser representado em diferentes formatos e até mesmo versões, além da possibilidade de se adicionar novos recursos sem precisar alterar os já existentes.</li>
+<li><strong>Confiabilidade</strong> porque existe uma separação clara das ações que podem ser feitas e dos seus efeitos colaterais.</li>
+<li><strong>Performance</strong> porque faz parte dos principais pilares do REST o uso de cache através de uma semântica bem definida, além de uma arquitetura baseada em separação de camadas, permitindo que partes diferentes do sistema possam ser escaladas de forma independente e isolada.</li>
+</ul>
+<p>O <strong>HTTP</strong> (<strong>H</strong>yper<strong>T</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol) - ou HTTPS na sua variante com encriptação - é o protocolo da internet, no qual acontece a grande maioria das comunicações. Basicamente, ele trata requisições entre um cliente e um servidor através de uma mensagem que contém um Header e um Body. Se fizer uma analogia a uma carta, eu tenho informações de entrega no envelope (header) e um conteúdo (carta dentro do envelope). O ciclo de vida contempla um envio (request que parte do cliente) e um retorno (response que parte do servidor). Na maioria das implementações, a comunicação é stateless, ou seja, ao término do ciclo &quot;request/response&quot;, as conexões com o servidor são encerradas. Além da mensagem, o HTTP define verbos para tratar as mensagens, códigos de retorno para indicar sucesso ou insucesso no processamento, padrões de endereço do servidor, entre outros.</p>
+<p><strong>RESTful</strong> é um conceito que define uma API construída seguindo todas as restrições impostas pelo REST. Leonard Richardson definiu um <a href="https://martinfowler.com/articles/richardsonMaturityModel.html">modelo de maturidade</a> onde ele divide a adoção do REST em etapas. Quando se implementa todas as etapas, considera-se que aquela é uma RESTful API.</p>
+<p>O REST surgiu à partir da dissertação de Roy Thomas Fielding - um dos criadores da web - e se baseia fortemente no HTTP reaproveitando muitos conceitos deste protocolo. A dissertação define de forma aberta o conceito e o mercado foi refinando e definindo convenções. Dessa forma, em alguns pontos existem várias formas de fazer a mesma coisa e não há necessariamente a mais correta. Assim, cabe a você analisar os <em>trade-offs</em> de cada forma e escolher a que melhor atende às necessidades dos seus software e principalmente do cliente consumidor do seu software.</p>
+<p>O ponto mais importante quando se fala em boas práticas é que seja adotado um padrão, pois à partir do momento que se tem um padrão, a curva de aprendizado para novas soluções é mais rápida e podem ser utilizados frameworks e automações para reduzir o tempo de desenvolvimento dos sistemas.</p>
+<p>Neste guia, busco compartilhar os padrões que implemento nas empresas onde já trabalhei ou boas práticas definidas em livros, artigos ou até mesmo APIs de mercado.</p>
+<h2 id="request"><a id="request"></a>Request</h2>
+<p>Assim como no protocolo HTTP, um cliente (consumidor da API) deve enviar uma mensagem dentro de um determinado padrão a um endereço (onde o servidor responde àquele padrão de mensagem) e aguardar a resposta.</p>
+<p>Na requisição, existem alguns padrões a serem seguidos e eles serão explicados um a um a seguir. Alguns são obrigatórios para o funcionamento da REST API, outros são boas práticas.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response">response</a></sub></p>
+<h3 id="request-url"><a id="request--url"></a>Request &gt; URL</h3>
+<p>A URL (Universal Resource Location) é o endereço onde o cliente vai fazer a requisição. Cada URL identifica um recurso diferente na API. Como no navegador, quando digitamos um endereço de um site e ele nos responde com a página, no REST é enviada uma solicitação para o endereço e ele nos responde com informações sobre o recurso.</p>
+<p>A URL é formada por basicamente 3 partes <a href="#request--url--base">Base Path</a>, <a href="#request--url--resources">Resources</a> (ou Path) e <a href="#request--url--query-strings">Query Strings</a>.</p>
+<p>Dado que URLs são case sensitive, é uma boa prática usar tudo em minúsculo para evitar possibilidade de erro na digitação (o que pode ser difícil de identificar). Veja:</p>
+<ul>
+<li>I &lt;- isto é um i maiúsculo</li>
+<li>l &lt;- isto é um L minúsculo</li>
+</ul>
+<p>Quando na URL existirem palavras compostas, é indicado o uso de hífen para separá-las. Nos interpretadores de texto, o hífen é um separador de palavras, ao contrário do underscore e de CamelCase. Por exemplo, dê um clique duplo nas palavras abaixo (apenas em PCs, pois no celular, ele só separa via espaços) e veja como apenas no caso do hífen é feita a seleção correta:</p>
+<ul>
+<li>CamelCase: primeiraSegunda</li>
+<li>Underscore: primeira_segunda</li>
+<li>Hífen: primeira-segunda</li>
+</ul>
+<blockquote>
+<p>Mais informações:
+<a href="https://support.google.com/webmasters/answer/76329">https://support.google.com/webmasters/answer/76329</a>
+<a href="https://stackoverflow.com/questions/10302179/hyphen-underscore-or-camelcase-as-word-delimiter-in-uris">https://stackoverflow.com/questions/10302179/hyphen-underscore-or-camelcase-as-word-delimiter-in-uris</a></p>
+</blockquote>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-url-base"><a id="request--url--base"></a>Request &gt; URL &gt; Base</h3>
+<p>O Base Path é a parte inicial da URL, nele você tem o protocolo (http:// ou https://, por exemplo) e o endereço do servidor na web. O Base Path se repetirá em todas as requisições.
+Ex:</p>
+<ul>
+<li><a href="https://maps.googleapis.com">https://maps.googleapis.com</a></li>
+<li><a href="https://management.azure.com">https://management.azure.com</a></li>
+<li><a href="https://api.spotify.com">https://api.spotify.com</a></li>
+</ul>
+<p>Algumas empresas têm URLs que representam os produtos da empresa, em outras a própria empresa é um produto. Nestes cenários, normalmente encontramos Base Paths com estruturas semelhantes a essas:</p>
+<ul>
+<li><a href="https://api.empresaexemplo.com">https://api.empresaexemplo.com</a></li>
+<li><a href="https://api.produtoexemplo.com">https://api.produtoexemplo.com</a></li>
+</ul>
+<p>Em outros cenários, não usam o termo &quot;api&quot; como nos exemplos do google ou azure (acima).
+Mas o ponto principal é que normalmente é utilizada uma URL diferente da URL do site da empresa (<a href="http://www.empresaexemplo.com">http://www.empresaexemplo.com</a> ou <a href="http://empresaexemplo.com">http://empresaexemplo.com</a>).</p>
+<p>Identificar ambientes de homologação e produção no Base Path também é interessante, pois reduz a configuração do ambiente durante o processo de publicação a apenas um parâmetro. Ex:</p>
+<ul>
+<li>Homologação: <a href="https://api-hml.empresaexemplo.com">https://api-hml.empresaexemplo.com</a></li>
+<li>Desenvolvimento: <a href="https://api-dev.empresaexemplo.com">https://api-dev.empresaexemplo.com</a></li>
+<li>Sandbox: <a href="https://api-sbx.empresaexemplo.com">https://api-sbx.empresaexemplo.com</a></li>
+<li>Produção: <a href="https://api.empresaexemplo.com">https://api.empresaexemplo.com</a></li>
+</ul>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-url-resources"><a id="request--url--resources"></a>Request &gt; URL &gt; Resources</h3>
+<p>No REST, a letra R significa &quot;Representação &quot;. Representação é a forma de apresentar os recursos (&quot;coisas&quot;) que existem no sistema. Recursos no REST são nomeados usando substantivos. Eles são as entidades de sistema que serão expostas para outros sistemas. Cada um desses recursos têm um endereço (URL) diferente e são representados por textos separados por barras após o Base Path. É muito importante que os nomes dos recursos sejam estruturados de forma que cumpram uma hierarquia que proporcione sentido próprio à URL. Os nomes escolhidos para os recursos devem ser de fácil entendimento, de modo que ao ler a URL se obtenha rapidamente a informação sobre qual recurso ela representa.</p>
+<p>Exemplos do Spotify:</p>
+<ul>
+<li>Endereço da representação de um recurso chamado &quot;artists&quot; no Spotify: <a href="https://api.spotify.com/v1/artists/">https://api.spotify.com/v1/artists/</a></li>
+<li>Endereço da representação de um recurso chamado &quot;albums&quot; do Spotify: <a href="https://api.spotify.com/v1/albums">https://api.spotify.com/v1/albums</a></li>
+<li>Endereço da representação de um recurso específico chamado dentro dos &quot;albums&quot; do Spotify: <a href="https://api.spotify.com/v1/albums/%7Bid%7D">https://api.spotify.com/v1/albums/{id}</a></li>
+<li>Endereço da representação de um recurso chamado &quot;tracks&quot; de um &quot;album&quot; específico do Spotify: <a href="https://api.spotify.com/v1/albums/%7Bid%7D/tracks">https://api.spotify.com/v1/albums/{id}/tracks</a></li>
+</ul>
+<p>Repare que existe um Base Path se repetindo em cada um dos endereços (<a href="https://api.spotify.com">https://api.spotify.com</a>) e um &quot;/v1&quot; também. Ele representa a versão da API e também é exposto como um recurso. Há mais informações sobre versionamento no capítulo <a href="#versionamento">Versionamento</a>.</p>
+<p id="">Observe que algumas URLs têm recursos como artists ou albums que não têm o  na frente. Elas deverão retornar listas, pois não se especifica nenhum &quot;artist&quot; ou &quot;album&quot; específico através de um . Outras URLs têm o  e retornarão apenas um item cujo id seja o id definido naquela URL. Este  é um <a href="#request--url--resources--path-parameters">Path Parameter</a>.</p>
+<p>Apenas para mais referências, seguem outros exemplos de mercado. Observe como os recursos se &quot;anhinham&quot; através das URLs:</p>
+<ul>
+<li>Endereço da lista de comentários de uma tarefa específica no jBPM da RedHat: https:///server/containers//tasks//comments</li>
+<li>Endereço da representação de um database específico no Azure: <a href="https://management.azure.com/subscriptions/%7BsubscriptionId%7D/resourceGroups/%7BresourceGroupName%7D/providers/Microsoft.Sql/servers/%7BserverName%7D/databases/%7BdatabaseName%7D">https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}</a></li>
+<li>Endereço de um projeto específico na API de Datastore do Google: <a href="https://datastore.googleapis.com/v1/projects/%7BprojectId%7D">https://datastore.googleapis.com/v1/projects/{projectId}</a></li>
+</ul>
+<p id="">Observe também que, ao contrário do exemplo do Spotify que deu nome apenas de  aos IDs, estes outros exemplos nomeiam de forma mais específica cada um dos IDs de cada recurso. Isto é interessante quando temos negócios mais complexos que envolvem muitos recursos.</p>
+<p>Quando os recursos forem formados por duas palavras, é boa prática separar com hífen. E assim como no <a href="#request--url--base">Base Path</a>, escreve-se tudo em minúsculo.</p>
+<p>Os recursos na maioria dos casos serão substantivos no plural, pois geralmente definem coleções (ex: cartões, usuários, clientes, carros, endereços etc.) Ao pensar no nome do recurso, é importante verificar se o nome não conflitará com alguma possível implementação parecida no futuro. Por exemplo, imagina um recurso que se chamaria ofertas-credito. Neste caso, a deve-se perguntar: &quot;este serviço ofertará todos os tipos de crédito no domínio de crédito?&quot; Se a reposta for: &quot;Não, apenas consignado&quot;, deve-se especificar o nome da entidade como ofertas-credito-consignado porque no futuro uma nova rota que oferte todos os tipos de crédito poderá ser criada com o nome oferta-credito.
+Ex:
+<a href="http://api.empresaexemplo.com/creditos/v1/ofertas-credito-consignado">http://api.empresaexemplo.com/creditos/v1/ofertas-credito-consignado</a></p>
+<p>Recursos criados no singular são menos frequentes e pode acontecer quando:</p>
+<ul>
+<li>Houver requerimentos de segurança ou permissão específicos para um atributo. Neste caso, o atributo se torna um recurso na URL, podendo ser aplicadas políticas específicas de segurança naquela rota.</li>
+<li>No recurso existir um <a href="#request--body">atributo</a> complexo com um número elevado de &quot;sub-atributos&quot;. Por conta da complexidade, pode-se optar por tornar este atributo um recurso.</li>
+<li>Houver recursos que não existam no plural, como saldo, extrato etc.</li>
+</ul>
+<p>Quando definir os recursos a serem expostos, deve-se <strong>evitar</strong>:</p>
+<ul>
+<li>Utilizar termos que não façam parte do nome da entidade de negócio, por exemplo: <s>detalhes_</s>lancamentos-cheque. A entidade de negócio se chama lancamentos_cheque, exibir todos os atributos ou não, fica a cargo de filtros na <a href="#request--url--query-strings">query string</a>, não na exposição como um recurso.</li>
+<li>Utilizar termos que representam as ações básicas do CRUD (consultar, gravar, atualizar, apagar etc). Por exemplo: <s>consultar-</s>fatura. As ações básicas do CRUD são representadas pelos <a href="#request--verbs">verbos HTTP</a> (GET, POST, PUT, PATCH e DELETE).</li>
+<li>Expor representações de detalhes do backend na entidade, por exemplo: /<s>servico-</s>transferencias. O termo &quot;servico&quot; neste caso está representando, por exemplo, o &quot;serviço&quot; do sistema que processa uma transferência. Este tipo de informação deve ser abstraída no nome do recurso. Nomeie-o apenas como .../transferencias. Ou um exemplo pior, chamar um recurso de .../X0PSD0054, sendo X0PSD0054 o nome interno de um serviço que processa boletos. Nomeie-o apenas como /boletos.</li>
+</ul>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-url-resources-funcoes-que-nao-sao-crud"><a id="request--url--resources--fun&#231;&#245;es-que-n&#227;o-s&#227;o-crud"></a>Request &gt; URL &gt; Resources &gt; Funções que não são CRUD</h3>
+<p>Uma das restrições do REST é que ele se aplica a recursos que representam as &quot;entidades&quot; de um <a href="#request--url--resources--dom%C3%ADnios-funcionais">Domínio Funcional</a>. Para alterar o estado dessas entidades, usamos os verbos GET, POST, PATCH, PUT e DELETE, que basicamente fazem o CRUD.</p>
+<p>No entanto, existem alguns cenários em que não temos &quot;entidades&quot; de um domínio, mas sim, ações e que não fazem parte do conjunto restrito de <a href="#request--verbs">verbos</a> do HTTP. Aqui estão alguns exemplos:</p>
+<ul>
+<li>Distância entre dois pontos (via coordenadas de GPS, CEP etc.)</li>
+<li>Validação de dados de cartão de crédito</li>
+<li>Cálculos em geral</li>
+</ul>
+<p>Para estes casos, tratamos essas funções como recursos e para facilitar a identificação de que não é uma &quot;entidade&quot;, usamos verbos no lugar dos substantivos.
+Ex:</p>
+<ul>
+<li>GET .../<strong>calcular-distancia</strong>?fromLatitude=48,8584&amp;fromLongitude=2,2945&amp;toLatitude=-22.951916&amp;toLongitude=-43.2104872</li>
+<li>POST .../<strong>validar-cartao</strong></li>
+</ul>
+<pre><code>{
+	&quot;numero&quot;: &quot;5346931596124410&quot;,
+	&quot;nomeTitular&quot;: &quot;JOSE A OLIVEIRA&quot;,
+	&quot;dataValidade&quot;: &quot;2024-05-23&quot;,
+	&quot;CVV&quot;: 996
+}
+</code></pre>
+<ul>
+<li>GET .../<strong>somar</strong>?primeiro-valor=72&amp;segundo-valor=28</li>
+</ul>
+<p>Observe que algumas chamadas representam consultas seguras (que não alteram o estado do recurso) e idempotentes (que podem ser repetidas retornando o mesmo resultado). Portanto, o verbo HTTP utilizado nelas foi o GET. Repare que o GET trafega a requisição via Query Strings: que são visíveis a todos. Os dados das Query Strings ou dos Path Parameters não são encriptados em uma conexão HTTPS.</p>
+<p>Nos casos em que a chamada não é segura, nem idempotente (por exemplo, em uma API de login, em que depois de algumas tentativas o login será bloqueado) devemos usar verbos como o POST.</p>
+<p>No exemplo da validação de cartão, trafegamos <strong>dados sensíveis</strong>. Mesmo sendo uma consulta segura (sem alterações de estado) e idempotente, por questões de segurança da informação, o tráfego de dados sensíveis é feito sempre via POST, pois no POST os dados são trafegados no Body e o Body pode ser encriptado.</p>
+<p>Para saber mais sobre idempotência, leia sobre os <a href="#request--verbs">verbos</a> HTTP.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-url-resources-dominios-funcionais"><a id="request--url--resources--dom&#237;nios-funcionais"></a>Request &gt; URL &gt; Resources &gt; Domínios Funcionais</h3>
+<p>Em algumas empresas, pode ser que não exista um Base Path para cada produto e uma mesma empresa forneça recursos de vários produtos diferentes através de API. Neste caso, pode-se criar um recurso que serve para agrupar os recursos de cada um dos produtos.
+Ex:</p>
+<ul>
+<li><a href="https://apis.bbva.com/customers/v1">https://apis.bbva.com/customers/v1</a></li>
+<li><a href="https://apis.bbva.com/accounts/v1">https://apis.bbva.com/accounts/v1</a></li>
+<li><a href="https://apis.bbva.com/cards/v2">https://apis.bbva.com/cards/v2</a></li>
+<li><a href="https://apis.bbva.com/payments/v1">https://apis.bbva.com/payments/v1</a></li>
+<li><a href="https://apis.bbva.com/loans/v1">https://apis.bbva.com/loans/v1</a></li>
+<li><a href="https://apis.bbva.com/notifications/v1">https://apis.bbva.com/notifications/v1</a></li>
+</ul>
+<p>Nos caso acima, o Banco BBVA agrupa todos os recursos referentes ao assunto &quot;cards&quot; sempre abaixo do recurso &quot;cards&quot; e assim por diante. Ex:</p>
+<ul>
+<li><a href="https://apis.bbva.com/cards/v2/cards">https://apis.bbva.com/cards/v2/cards</a></li>
+<li><a href="https://apis.bbva.com/cards/v2/cards/%7Bcardid%7D">https://apis.bbva.com/cards/v2/cards/{cardid}</a></li>
+<li><a href="https://apis.bbva.com/cards/v2/cards/%7Bcardid%7D/transactions">https://apis.bbva.com/cards/v2/cards/{cardid}/transactions</a></li>
+</ul>
+<blockquote>
+<p>Para mais detalhes sobre essas APIs veja: <a href="https://www.bbvaapimarket.com/products">https://www.bbvaapimarket.com/products</a></p>
+</blockquote>
+<p>A mesma abordagem de agrupamento provavelmente será útil para APIs expostas apenas internamente nas empresas para integrações entre diferentes sistemas. Isso porque definir um recurso na URL envolve menos mudanças na implantação do que criar um Base Path para cada um dos produtos/assuntos da empresa.</p>
+<p>Em algumas empresas, esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas etc.), processos (contratações, on-boarding etc.) ou serviços (comunicações, chat etc.). É boa prática usar nomes em minúsculo e, se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural.</p>
+<p>Também é interessante manter os contratos de cada domínio separados para dar independência para os times que cuidam de cada um deles, além de permitir gerir o ciclo de vida de cada um deles de forma separada.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-url-resources-path-parameters"><a id="request--url--resources--path-parameters"></a>Request &gt; URL &gt; Resources &gt; Path Parameters</h3>
+<p id="">Nos exemplos acima, alguns dos recursos estavam com a notação . Eles são Path Parameteres, ou seja, são parâmetros que podem variar conforme a consulta. Por exemplo, na API do Spotify <a href="https://api.spotify.com/v1/albums/%7Bid%7D/tracks">https://api.spotify.com/v1/albums/{id}/tracks</a>, no lugar do , em tempo de execução, o sistema deverá colocar o Id de um álbum específico para poder listar as faixas do respectivo álbum.
+Ex:</p>
+<ul>
+<li><a href="https://api.spotify.com/v1/albums/0sNOF9WDwhWunNAHPD3Baj/tracks">https://api.spotify.com/v1/albums/0sNOF9WDwhWunNAHPD3Baj/tracks</a></li>
+<li><a href="https://api.spotify.com/v1/albums/2kLIU5SVDjnEUndjks72ddP/tracks">https://api.spotify.com/v1/albums/2kLIU5SVDjnEUndjks72ddP/tracks</a></li>
+</ul>
+<p>Os path parameters são destinados exclusivamente para identificar os recursos dentro das coleções mediante seu identificador único.</p>
+<p>É boa prática, usar nomes em minúsculo e se composto, separar com hífen. Os Path Parameters na maioria dos casos serão compostos por &quot;id&quot; + nome do recurso no singular em camelCase.</p>
+<p>Ex:</p>
+<ul>
+<li><a href="http://api.exemploempresa.com/cartoes/v1/cartoes/%7BidCartao%7D/faturas/%7BidFatura%7D/lancamentos/%7BidLancamento%7D">http://api.exemploempresa.com/cartoes/v1/cartoes/{idCartao}/faturas/{idFatura}/lancamentos/{idLancamento}</a></li>
+</ul>
+<p>Desta forma, quando a aplicação recuperar a coleção de parâmetros, terá a seguinte lista:
+<em>idCartao</em>, <em>idFatura</em> e <em>idLancamento</em>, cada uma com um nome que a identifica unicamente na coleção.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-url-query-strings"><a id="request--url--query-strings"></a>Request &gt; URL &gt; Query Strings</h3>
+<p>Além dos Path Parameters, Query Strings também permite passar parâmetros na URL da chamada. Query Strings são usadas para filtrar resultados em consultas. Elas são definidas após os resources, iniciando com uma <strong>?</strong> e separando cada par de chave e valor  (<strong>chave=valor</strong>) com um <strong>&amp;</strong>:</p>
+<p><em><strong>.../recurso?chave1=valor1&amp;chave2=valor2&amp;chaveA=valorA</strong></em></p>
+<p>Assim, uma API que busque restaurantes de comida japonesa na cidade de são paulo, teria uma URL semelhante a esta:</p>
+<pre>https://api.empresaturismo.com.br/locais/v1/restaurantes?tipoComida=japonesa&cidade=S%C3%A3o%20Paulo</pre>
+<p>Sempre respeitando o conjunto caracteres permitidos em URLs. Para mais informações sobre esses valores, veja <a href="https://www.w3schools.com/tags/ref_urlencode.asp">URL Encode</a>.</p>
+<p>Os filtros aplicados podem tratar diversas situaçoes e é importante convencionar o comportamento da API conforme o tipo de filtro que é feito:</p>
+<table>
+<thead>
+<tr>
+<th>Tipo de dado</th>
+<th>Operação</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Numérico, Data e Booleano</td>
+<td>Igualdade</td>
+<td>Retorna aqueles recursos cujo valor do atributo tenha exatamente o valor especificado. Ex: ...?quantidade=5 devolverá aqueles recursos cujo atributo &quot;quantidade&quot; tenha o valor 5.</td>
+</tr>
+<tr>
+<td>Numérico, Data e Booleano</td>
+<td>Ou</td>
+<td>Retorna aqueles recursos cujo valor do atributo esteja contido em uma lista de valores. Ex: ...?quantidade=5&amp;quantidade=9&amp;quantidade=12 retornará aqueles recursos cujo atributo quantidade seja 5, 9 ou 12.</td>
+</tr>
+<tr>
+<td>Numérico e Data</td>
+<td>Maior ou Igual</td>
+<td>Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “fromQuantidade” e menor ou igual o valor definido em &quot;toQuantidade&quot;. Ex: ...?fromQuantidade=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também <a href="#ranges">Ranges</a>.</td>
+</tr>
+<tr>
+<td>Texto</td>
+<td>Contém</td>
+<td>Retorna aqueles recursos cujo valor do atributo contenha o valor especificado. Ex: …?nome=Frederico retornará aqueles recursos que contenham “Frederico” no atributo nome. São retornos válidos válidos: “Frederico Garcia”, “Don Frederico”, “Frederico”.</td>
+</tr>
+<tr>
+<td>Texto</td>
+<td>Ou Contém</td>
+<td>Retorna aqueles recursos cujo valor do atributo contenha um dos valores especificados. Ex: nome=Frederico&amp;nome=Antonio retornará aqueles recursos que contenham “Frederico” ou &quot;Antonio&quot; no atributo nome. São retornos válidos válidos: “Frederico Antonio”, “Don Frederico”, “Frederico”, “Antonio Ramirez”.</td>
+</tr>
+</tbody>
+</table>
+<p>De forma resumida, o operador <strong>&amp;</strong> que separa as Query Strings é um <strong>Ou</strong> para os valores de um mesmo atributo e um <strong>E</strong> entre atributos diferentes.</p>
+<p>Como as Query Strings geralmente serão atributos dos recursos, utiliza-se o mesmo padrão (camelCase) que os utilizados no body dos recursos.</p>
+<p>Geralmente, Query Strings não são utilizadas nos casos em que se busca um recurso cujo ID que já está definido na URL via Path Parameter. Isto porque, normalmente as Query Strings são utilizadas para filtrar dentro de uma coleção de resultados. Quando se tem o ID definido, não temos uma coleção de resultados, mas um específico já especificado pelo cliente.</p>
+<p>As query string não são utilizadas somente para filtros, ela pode ser utilizada como parâmetros para paginação, versionamento, ordenação etc.</p>
+<blockquote>
+<p>Existem padrões de mercado para filtrar os recursos via query string como <a href="https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00">FIQL</a>, <a href="https://www.odata.org/getting-started/basic-tutorial/">OData</a>, <a href="https://graphql.org/">GraphQL</a> e a adoção de uma delas significa agregar mais uma especificação sobre o REST. Assim, em um primeiro momento, utilizar um conjunto padrão, mais reduzido de Query Strings para fazer filtros básicos vai permitir trazer uma grande flexibilidade às REST APIs e ao mesmo tempo entregar uma curva de aprendizado mais rápida àqueles que estão embarcando no padrão. Com a maturidade do time de TI neste assunto, a adoção futura de um desses frameworks ajudará a entregar APIs ainda mais flexíveis.</p>
+</blockquote>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-url-query-strings-full-text-search"><a id="request--url--query-strings--full-text-search"></a>Request &gt; URL &gt; Query Strings &gt; Full text search</h3>
+<p>Algumas APIs podem implementar a capacidade de buscar em vários atributos ao mesmo tempo. Quando se tem essa capacidade, utiliza-se o query string <strong>q</strong> (de query) com o termo a ser pesquisado.</p>
+<p>Ex:</p>
+<p>GET <a href="http://api.empresarh.com/candidatos?q=Paulo">http://api.empresarh.com/candidatos?q=Paulo</a></p>
+<p>No caso, o resultado tratá todos os recursos candidatos onde algum atributo pesquisável contém o texto Paulo.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--body--full-text-search">response  full text search</a></sub></p>
+<h3 id="request-url-query-strings-paginacao"><a id="request--url--query-strings--pagina&#231;&#227;o"></a>Request &gt; URL &gt; Query Strings &gt; Paginação</h3>
+<p>Quando uma API retorna uma lista de resultados, pode ser que esses resultados cheguem a dezenas ou milhares de registros. Na maioria das vezes, as telas das aplicações não exibem todos ao mesmo tempo e quando se trata de API, espera-se respostas rápidas. Por conta disso, é uma boa prática dividir os resultados em blocos. Este processo chamamos de paginação.</p>
+<p>Paginando as respostas, a mensagem trafegada fica menor, e por isso, o cliente recebe o resultado da requisição muito mais rápido, além de permitir um uso mais racional e otimizado dos recursos do servidor.</p>
+<p>Existem algumas formas de definir exatamente qual &quot;bloco de informação&quot; consultar. Estas formas estão descritas à seguir.</p>
+<h3 id="request-url-query-strings-paginacao-range"><a id="request--url--query-strings--pagina&#231;&#227;o--range"></a>Request &gt; URL &gt; Query Strings &gt; Paginação &gt; Range</h3>
+<p>Podemos delimitar a quantidade de resultados à partir da filtragem de um determinado parâmetro, por exemplo, se o parâmetro for <strong>dataNascimento</strong>, a chamada à uma API ficaria assim:</p>
+<p><a href="http://api.empresarh.com/candidatos?fromDataNascimento=1985-01-01&amp;toDataNascimento=2001-12-31">http://api.empresarh.com/candidatos?fromDataNascimento=1985-01-01&amp;toDataNascimento=2001-12-31</a></p>
+<p>Para atuar como um cursor e filtrar um range de IDs, a chamada ficaria assim:</p>
+<p><a href="http://api.empresarh.com/candidatos?fromId=1000&amp;toId=1099">http://api.empresarh.com/candidatos?fromId=1000&amp;toId=1099</a></p>
+<p>É uma boa prática adotar padrões para definir a estrutura do parâmetro que trata ranges, como sugestão:</p>
+<ul>
+<li><strong>&quot;from&quot; + nomeDoAtributo</strong></li>
+<li><strong>&quot;to&quot; + nomeDoAtributo</strong></li>
+</ul>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--body--pagina%C3%A7%C3%A3o--range">response  range</a></sub></p>
+<h3 id="request-url-query-strings-paginacao-page-e-limit"><a id="request--url--query-strings--pagina&#231;&#227;o--page-e-limit"></a>Request &gt; URL &gt; Query Strings &gt; Paginação &gt; Page e Limit</h3>
+<p>A paginação baseada em  <strong>page</strong>  e  <strong>limit,</strong>  como o próprio nome já diz, é utilizada através dos parâmetros de número da página a ser navegada e o seu respectivo tamanho (em número de registros).</p>
+<p>Ambos são opcionais e caso não sejam definidos na URL, é esperado que a API retorne todos os registros ou retorne na página 1 com a quantidade de registros padrão da API.
+Ex:</p>
+<p><a href="https://api.exemploclassificados.com/veiculos?page=3&amp;limit=30">https://api.exemploclassificados.com/veiculos?page=3&amp;limit=30</a></p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--body--pagina%C3%A7%C3%A3o--page-e-limit">response  page e limit</a></sub></p>
+<h3 id="request-url-query-strings-paginacao-top"><a id="request--url--query-strings--pagina&#231;&#227;o--top"></a>Request &gt; URL &gt; Query Strings &gt; Paginação &gt; Top</h3>
+<p>O query string <strong>top</strong> permite limitar a quantidade de registros que a API retorna à partir do primeiro registro da coleção.</p>
+<p>Ex:
+<a href="https://api.lojaexemplo.com/ofertas-noturnas?top=10">https://api.lojaexemplo.com/ofertas-noturnas?top=10</a></p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--body--pagina%C3%A7%C3%A3o--top">response top</a></sub></p>
+<h3 id="request-url-query-strings-ordenacao"><a id="request--url--query-strings--ordena&#231;&#227;o"></a>Request &gt; URL &gt; Query Strings &gt; Ordenação</h3>
+<p>Em APIs que retornem conjuntos de registros, é interessante permitir alguma ordenação básica.
+A ordenação pode ser especificada através das query string <strong>sort=[:{asc|desc}]</strong>.</p>
+<p>Ex:</p>
+<p>GET .../pedidos?sort=dataPagamento:desc,dataPedido</p>
+<p>No exemplo, desejo que a lista de pedidos venha ordenada de forma decrescente pela dataPagamento e de forma ascendente (valor default) pela dataPedido.</p>
+<p>No caso de não ser especificada uma ordem {asc|desc}, será utilizada a ascendente como padrão.</p>
+<p>Importante: Quando se define o contrato da API, é importante definir a lista de quais atributos estão disponíveis para ordenação. Nem sempre todos eles estarão disponíveis para esse fim.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--body--ordena%C3%A7%C3%A3o">response  ordenação</a></sub></p>
+<h3 id="request-url-query-strings-fields"><a id="request--url--query-strings--fields"></a>Request &gt; URL &gt; Query Strings &gt; Fields</h3>
+<p>Existem situações onde o cliente deseja obter apenas alguns dos atributos de um recurso. Para estas situações pode-se utilizar o query string <strong>fields=[atributo.sub-atributo]</strong> para selecionar apenas aqueles atributos do recurso que o cliente deseja receber.
+Para &quot;sub-atributos&quot;,  utiliza-se o &quot;.&quot; para separá-los.
+Veja o exemplo:</p>
+<p><a href="https://api.lojaexemplo.com/clientes/jose-da-silva123/enderecos/residencial-1?fields=nome,situacao,logradouro.rua,logradouro.numero">https://api.lojaexemplo.com/clientes/jose-da-silva123/enderecos/residencial-1?fields=nome,situacao,logradouro.rua,logradouro.numero</a></p>
+<p>Com a chamada acima, não terei como retorno qualquer outro atributo de endereço senão os definidos no fields: <em>nome</em>, <em>situacao</em>, <em>logradouro.rua</em> e <em>logradouro.numero</em></p>
+<p>O uso desta opção nos permite otimizar o uso da banda de rede em toda a cadeia de comunicação, reduzir a quantidade de logs gerados e tamanho das respostas a serem processadas, melhorando a experiência final do usuário.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--body--fields">response  fields</a></sub></p>
+<h3 id="request-url-query-strings-views"><a id="request--url--query-strings--views"></a>Request &gt; URL &gt; Query Strings &gt; Views</h3>
+<p>Existem situações em que é comum um recurso ter vários atributos e ter um conjunto deles que é de uso muito comum entre os clientes daquela API.</p>
+<p>Ao invés de fazer com que esses clientes filtrem os atributos pela query string <a href="#request--url--query-strings--fields">fields</a>, fazendo com que a URL da requisição fique muito grande, pode-se criar conjuntos pré defindos de &quot;visões&quot; que retornam apenas alguns sub conjuntos de atributos.
+Ex:</p>
+<ul>
+<li>GET .../cartoes/a7834dcG456?view=basico
+para retornar o conjunto de atributos relacionados a alguma consulta frequente de dados básicos.</li>
+<li>GET .../cartoes/a7834dcG456?view=limites
+para retornar todos os atributos relacionados a alguma consulta frequente de limites.</li>
+<li>GET .../cartoes/a7834dcG456
+para retornar todos os atributos.</li>
+</ul>
+<p>Dependendo da complexidade do recurso, as visões podem ser combinadas na mesma requisição e ela pode ser usada em conjunto com o <a href="#request--url--query-strings--fields">fields</a> e <a href="#request--url--query-strings--expand">expand</a>.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--body--views">response views</a></sub></p>
+<h3 id="request-url-query-strings-expand"><a id="request--url--query-strings--expand"></a>Request &gt; URL &gt; Query Strings &gt; Expand</h3>
+<p>Quando é necessário em uma única chamada retornar um determinado recurso mais os recursos relacionados com ele, pode-se utilizar um query string <strong>expand</strong>. Este mecanismo permite reduzir a quantidade de chamadas à API e volume de informações trafegadas.</p>
+<p>Ex:
+Tome como referência as seguintes APIs</p>
+<ul>
+<li>GET .../cartoes/</li>
+<li>GET .../cartoes//faturas/</li>
+</ul>
+<p>Para retornar os dados do cartão com id = a7834dcG456 mais o recurso de faturas associado a ele, especificamente a de agosto de 2018,  com o expand, faz-se a seguinte chamada:</p>
+<p>GET .../cartoes/a7834dcG456?<strong>expand</strong>=faturas&amp;faturas.id=ago18</p>
+<p>Observe que há a definição do recurso a ser expandido (expand=faturas) e também um filtro (faturas.id=ago18), sendo que no filtro, utilizou-se um padrão de recurso+&quot;.&quot;+atributo.</p>
+<p>Caso vários recursos precisem ser expandidos, define-se separando-os por vírgulas.</p>
+<p>Ex: GET .../cartoes/a7834dcG456?expand=faturas,adicionais,ofertas-upgrade</p>
+<p>Caso seja necessário especificar paginação ou ordenação em um recurso expandido, deve-se definir estes Query Strings assim como se definem filtros.</p>
+<p>Ex:
+GET .../cartoes/a7834dcG456?expand=faturas&amp;faturas.top=5&amp;faturas.sort=dataVencimento:desc</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--body--expand">response  expand</a></sub></p>
+<h3 id="request-url-alias"><a id="request--url--alias"></a>Request &gt; URL &gt; Alias</h3>
+<p>Muitas APIs nascem com alguns poucos recursos e conforme demandas de negócio, novos recursos vão sendo adicionados. Por falta de visão do todo no início da criação da API, por vezes, é necessário criar outras formas de fazer a mesma tarefa. <strong>Alias</strong> é o conceito de que é possível ter mais de um caminho para fazer a mesma tarefa.
+No entanto, é importante que uma entidade de negócio (recurso com seus atributos) se mantenha a mesma, independente da forma com que a consulta é feita.</p>
+<p>Por exemplo, em uma APIs de cartões, o time da TI cria o recurso de busca de transações da seguinte forma:</p>
+<p>GET .../transacoes?idCartao=123</p>
+<p>Em um segundo momento, novos recursos surgiram e com o amadurecimento, entenderam que a estrutura mais adequada seria essa:</p>
+<p>GET .../cartoes/123/transacoes</p>
+<p>Ambas implementam a mesma busca, apesar das diferentes abordagens de modelagem.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-headers"><a id="request--headers"></a>Request &gt; Headers</h3>
+<p>O header é um dos componentes que fazem parte do protocolo HTTP. Como o REST é baseado neste protocolo, as REST APIs trafegam headers como parte da comunicação. O header basicamente é um conjunto de chaves/valor.</p>
+<p>Por padrão, passamos nos headers informações não relacionadas aos recursos expostos nas URLs (que representam as entidades de negócio). De forma análoga, não colocamos atributos técnicos que não representem o negócio dentro dos recursos.</p>
+<p>Nos headers trafegamos somente informações técnicas como informações de acesso e credenciais, tokens, chaves de API, Correlation IDs, metadados etc.</p>
+<p>Alguns headers são padrões do protocolo <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers">HTTP</a>, outros podem ser definidos de forma personalizada para as necessidades da sua empresa ou por frameworks de mercado que definem conjuntos de headers para necessidades específicas.</p>
+<p>Separar este tipo de informação nos headers evita que as entidades de negócio (recursos) trafeguem dados que só existem por conta da comunicação via REST API.
+Por exemplo, se eu estou expondo uma REST API de seguros, informações de token são desconhecidas pelo negócio de seguros e só existem na comunicação por se tratar de REST API. Caso a comunicação acontecesse via webservices, os dados de seguro seriam os mesmos, mas os metadados da comunicação seriam diferentes.</p>
+<p>Para mais informações sobre headers, veja: <a href="#seguran%C3%A7a">Segurança</a> e <a href="#performance-cache-e-compress%C3%A3o">Cache</a>.</p>
+<p>Dentre os vários headers do protocolo <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers">HTTP</a>, alguns são mais utilizados no contexto de API e serão explicados a seguir.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-headers-content-type"><a id="request--headers--content-type"></a>Request &gt; Headers &gt; Content-Type</h3>
+<p>O Content-Type é um header que define qual o formato da estrutura de dados presente no Body. Existem muitos tipos de dados, como &quot;text/plain&quot;, &quot;application/xml&quot;, &quot;text/html&quot;, &quot;application/json&quot;, &quot;image/gif&quot;, &quot;image/jpeg&quot; etc. Quando falamos de REST API, na maior parte das implementações é disponibilizado apenas o &quot;application/json&quot;.</p>
+<p>Ex: <strong>Content-Type</strong>: application/json</p>
+<p>Obs: Não utilizado no DELETE, pois o DELETE não tem Body.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--headers--content-type">response content type</a></sub></p>
+<h3 id="request-headers-accept"><a id="request--headers--accept"></a>Request &gt; Headers &gt; Accept</h3>
+<p>O cliente da REST API pode expressar qual o tipo de informação que ele deseja receber a resposta através do hearder <strong>Accept</strong> . Nota-se que nem todos os content-types são implementados pelos servidores.</p>
+<p>Ex: <strong>Accept</strong>: application/json</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-headers-correlation-id"><a id="request--headers--correlation-id"></a>Request &gt; Headers &gt; Correlation ID</h3>
+<p>Não há um header padronizado para Correlation ID, mas é de grande valor que todas as chamadas tenham um Correlation Id.</p>
+<p>Correlation ID é um dado geralmente gerado randomicamente (UUIDs é um bom formato para isso) que deve ser repassado em cada camada de software pelo qual a comunicação trafega. Como cada camada gera o seu próprio log e muitas vezes em repositórios diferentes. Através do Correlation ID, é possível identificar uma chamada específica entre estes diferentes repositórios, permitindo um mapeamento da chamada de ponta-a-ponta.</p>
+<p>O comportamento esperado de qualquer camada é: se o Correlation ID vier preenchido, repassar para a próxima camada, senão, gerar um novo Correlation ID e repassar. O momento mais adequado para que o Correlation ID seja gerado é no início da cadeia de eventos de uma chamada, normalmente é no cliente quando uma requisição é disparada.</p>
+<p>Quando a arquitetura das aplicações está baseada em microsserviço, o Correlation ID percorre uma trajetória mais ampla do que simplesmente algo que inicia no canal e termina na API. Quando um cliente preenche um formulário e clica em gravar, podem ocorrer validações de cartão de crédito, acionamento do sistema de pagamento, comunicação com sistema de envio postal, serviço de e-mails, serviço de geolocalização etc. sendo cada um desses um microsserviço diferente, com suas camadas de gateway, API, sistema produto, LOGs etc. Em todos esses sistemas, o mesmo Correlation ID deve ser compartilhado.</p>
+<p>Ex:</p>
+<p>Uma aplicação client faz uma chamada à API, neste momento ele cria um Correlation ID para esta chamada, acrescenta-o no header e grava o seu log na sua estrutura de log com este Correlation ID. Um Gateway de API recebe este Correlation ID e grava o seu log em outra estrutura utilizando o mesmo identificador. O sistema que responde ao produto que está exposto via API recebe o Correlation ID, grava o seu log e chama outro sistema que responde a uma parte da requisição e assim todos os demais envolvidos nesta chamada mantém o mesmo comportamento.
+No momento em que se faz necessário mapear a chamada de ponta-a-ponta, basta unir os logs vindos de diversos fontes através deste identificador.</p>
+<p>Quando se define headers que não são padrões do HTTP, muitos utilizam o formato <em>X-Nome-Header</em>, no entanto, esta abordagem não é a mais recomendada desde 2012 (<a href="https://tools.ietf.org/html/rfc6648">rfc6648</a>). No caso, não se usa mais este &quot;X-&quot;.</p>
+<p>É interessante colocar um prefixo para diferenciar headers específicos da sua API, por exemplo, se sua empresa se chamada &quot;Banco Dourado&quot;, os headers que não são padrões HTTP podem ser definidos como BancoDourado-Nome-Header-Customizado.</p>
+<p>Se observar a estrutura dos headers padrões (<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers">Headers HTTP</a>), as palavras são separadas por hífen e iniciam em maiúsculas.</p>
+<p>Assim, para o Correlation ID é interessante assumir o formato <strong>Empresa-Correlation-ID</strong>.
+Por exemplo, assumindo o nome da empresa como &quot;Banco Dourado&quot;, o header fica:</p>
+<ul>
+<li><strong>BancoDourado-Correlation-ID</strong>: 680987b5-c18d-4f2f-a772-2a2d422789b1</li>
+</ul>
+<p>Recomenda-se que o Correlation ID siga o padrão UUID v4.</p>
+<blockquote>
+<p>Para conhecer mais sobre UUID, consulte:
+<a href="https://en.wikipedia.org/wiki/Universally_unique_identifier">https://en.wikipedia.org/wiki/Universally_unique_identifier</a>
+<a href="https://www.npmjs.com/package/uuid">https://www.npmjs.com/package/uuid</a>
+<a href="https://www.uuidgenerator.net/">https://www.uuidgenerator.net/</a></p>
+</blockquote>
+<p>O Correlation ID também é útil para ser lançado na tela de erro. Por exemplo, como apresentado nesta tela do Office 365:</p>
+<p><img src="https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/resources/office365errorscreen.png?raw=true" alt="Imagem exibindo um erro no Office 365 com o Correlation ID"></p>
+<p><em>Com o Correlation Id, é possível buscar nas bases de log a exata transação que estava acontecendo no momento do erro.</em></p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="request-verbs"><a id="request--verbs"></a>Request &gt; Verbs</h3>
+<p>Os <strong>métodos</strong> (ou verbos do protocolo HTTP) são basicamente as ações permitidas dentro de uma API. Estas ações solicitam que seja processado  o CRUD (Create, Read, Update e Delete) nos recursos alterando os seus estados.</p>
+<p>Existem vários verbos HTTP (<a href="https://tools.ietf.org/html/rfc2616">rfc2616</a>), mas 5 são os principais e em muitos casos, os únicos adotados nas APIs. Cada verbo HTTP tem um objetivo bem definido dentro do contexto de REST API. São eles:</p>
+<ul>
+<li>GET: para a obtenção de um recurso ou uma coleção de recursos.</li>
+<li>POST: para a criação de um recurso.</li>
+<li>DELETE: para eliminar um recurso.</li>
+<li>PUT: para atualizações completas de um recurso.</li>
+<li>PATCH: para atualizações parciais de um recurso.</li>
+</ul>
+<p>Os verbos são usados na requisição em conjunto com a URL e às vezes com um <a href="#request--body">Body</a>, como nos casos de inserção ou atualização.</p>
+<p>Existem também outros verbos como OPTIONS, HEAD e TRACE que raramente são utilizados. Vale a leitura da função desses métodos <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Methods">aqui</a>.</p>
+<h4 id="idempotencia-e-seguranca"><a id="idempot&#234;ncia-e-seguran&#231;a"></a>Idempotência e Segurança</h4>
+<p>Os verbos têm características importantes que devem ser conhecidas e respeitadas, são elas segurança e idempotência:</p>
+<ul>
+<li><p><strong>Idempotência</strong> significa que se um cliente realiza um reenvio de uma requisição, o servidor devolve a mesma resposta da vez anterior (salvo se o recurso teve seu estado alterado neste meio tempo). Ou seja, o reenvio da requisição não gera efeito nenhum sobre o recurso. Ex: (Situação Idempotente com PATCH/PUT) Atualizar a data de nascimento de um usuário 1x ou 10x gera o mesmo efeito sobre o recurso. (Situação Não Idempotente com POST) Fazer uma mesma transferência bancária 1x ou 10x resultará em sucessivos descontos no saldo.</p>
+</li>
+<li><p><strong>Seguros</strong> são todos os verbos que não podem provocam alterações no estado dos recursos. Ou seja, os verbos apenas de consulta (HEAD, GET, OPTIONS). Destes três, somente o GET é mais utilizado.</p>
+</li>
+</ul>
+<p>A tabela abaixo exibe a relação entre Verbo HTTP e os conceitos de Idempotência e método Seguro:</p>
+<table>
+<thead>
+<tr>
+<th>Verbo</th>
+<th>Idempotente</th>
+<th>Seguro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>Sim</td>
+<td>Sim</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>Sim</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>Sim</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>Não</td>
+<td>Não</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>Sim</td>
+<td>Não</td>
+</tr>
+</tbody>
+</table>
+<p>É importante escolher o verbo correto conforme estas características ao definir uma API, assim como codificar a API respeitando estas regras. Parta do princípio que o cliente da sua API sabe que, por exemplo, o GET é idempotente e seguro. Por isso, ele não vai hesitar em implementar re-tentativas em caso de insucesso na chamada.
+Se ao codificar a API, o desenvolvedor da API codificar um GET que não seja seguro ou idempotente, o cliente não terá o comportamento esperado.</p>
+<h3 id="request-verbs-get"><a id="request--verbs--get"></a>Request &gt; Verbs &gt; GET</h3>
+<p>Este verbo é o mais utilizado e serve para buscar dados nas APIs. Ele é utilizado em conjunto com uma URL com seus Path Parameters e/ou Query Strings para enviar uma consulta e o servidor retorna os dados em caso de sucesso. Em requisições do tipo GET, não se envia <a href="#request--body">Body</a>.</p>
+<p>Exemplo de utilização de GET para fazer uma consulta por cidades no estado de São Paulo com população maior do que 20000 habitantes:</p>
+<p>Com a URL com o formato <a href="http://api.exemplo.com/estados/%7BidEstado%7D/cidades">http://api.exemplo.com/estados/{idEstado}/cidades</a></p>
+<p><strong>GET</strong> <a href="http://api.exemplo.com/estados/sp/cidades?fromPopulacao=20000">http://api.exemplo.com/estados/sp/cidades?fromPopulacao=20000</a></p>
+<p>Exemplo de utilização de GET para fazer uma consulta pela cidade de Santos:</p>
+<p>Com a URL com o formato <a href="http://api.exemplo.com/estados/%7BidEstado%7D/cidades/%7BidCidade%7D">http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}</a></p>
+<p><strong>GET</strong> <a href="http://api.exemplo.com/estados/sp/cidades/santos">http://api.exemplo.com/estados/sp/cidades/santos</a></p>
+<h3 id="request-verbs-post"><a id="request--verbs--post"></a>Request &gt; Verbs &gt; POST</h3>
+<p>O <strong>POST</strong> é usado para criar novos recursos. Ele é utilizado em conjunto com uma URL com seus Path Parameters e um <a href="#request--body">Body</a> para enviar um conjunto de atributos que represente o estado do novo recurso no momento que você está criando ele.</p>
+<p>Exemplo utilizando o verbo POST para criar uma nova cidade:</p>
+<p>Com a URL com o formato <a href="http://api.exemplo.com/estados/%7BidEstado%7D/cidades/%7BidCidade%7D">http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}</a></p>
+<p><strong>POST</strong> <a href="http://api.exemplo.com/estados/sp/cidades/">http://api.exemplo.com/estados/sp/cidades/</a></p>
+<pre><code>{
+   &quot;nome&quot;: &quot;São Vicente&quot;,
+   &quot;DDD&quot;: 13,
+   &quot;descrição&quot;: &quot;Primeira cidade do Brasil&quot;, 
+   &quot;populacao&quot;: 355542
+}
+</code></pre>
+<p>Dando tudo certo, uma nova cidade será criada na coleção de cidades.</p>
+<p>Obs: O POST também pode ser usado em casos especiais onde se faz necessário encriptar as informações que seriam usadas em uma <strong>consulta</strong>, pois ao contrário do GET, com o uso de POST podemos enviar as informações no <a href="#request-body">Body</a> e o Body pode ser encriptado, já o GET passa os parâmetros de consulta de forma aberta na URL.</p>
+<h3 id="request-verbs-put"><a id="request--verbs--put"></a>Request &gt; Verbs &gt; PUT</h3>
+<p>O verbo <strong>PUT</strong> atualiza ou cria um recurso, ou seja, se eu utilizar o PUT para enviar novamente a cidade de São Vicente (como no exemplo do POST), o servidor irá sobrepor completamente o recurso com os dados definidos no Body. Portanto, caso algum campo não seja informado, o valor dele será apagado. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.</p>
+<p>Quando usamos <strong>PUT</strong> normalmente estamos atualizando um recurso existente, por isso é importante definir qual é especificamente o recurso através do ID no Path Parameter.</p>
+<p>Ex:</p>
+<p>Com a URL com o formato <a href="http://api.exemplo.com/estados/%7BidEstado%7D/cidades/%7BidCidade%7D">http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}</a></p>
+<p><strong>PUT</strong> <a href="http://api.exemplo.com/estados/sp/cidades/sao-vicente">http://api.exemplo.com/estados/sp/cidades/sao-vicente</a></p>
+<pre><code>{
+   &quot;nome&quot;: &quot;São Vicente&quot;,
+   &quot;DDD&quot;: 13,
+   &quot;descrição&quot;: &quot;Primeira cidade do Brasil.&quot;, 
+   &quot;populacao&quot;: 400000
+}
+</code></pre>
+<p idestado="" idcidade="">No exemplo, passamos dois Path Parameters, o  com o valor &quot;sp&quot; e o  com o valor &quot;sao-vicente&quot;.</p>
+<h3 id="request-verbs-patch"><a id="request--verbs--patch"></a>Request &gt; Verbs &gt; PATCH</h3>
+<p>O verbo <strong>PATCH</strong>  serve para fazer atualizações parciais no recurso. Neste caso, ele se comporta de forma semelhante ao PUT, no entanto, define-se no Body apenas os parâmetros que serão alterados.</p>
+<p>Ex:</p>
+<p>Com a URL com o formato <a href="http://api.exemplo.com/estados/%7BidEstado%7D/cidades/%7BidCidade%7D">http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}</a></p>
+<p><em>Request</em></p>
+<p><strong>PATCH</strong> <a href="http://api.exemplo.com/estados/sp/cidades/sao-vicente">http://api.exemplo.com/estados/sp/cidades/sao-vicente</a></p>
+<pre><code>{
+   &quot;populacao&quot;: 500000
+}
+</code></pre>
+<p>No exemplo, a API atualizará apenas o atributo &quot;populacao&quot;. Em uma nova chamada usando GET, o valor em &quot;populacao&quot; deverá ser 500000.</p>
+<h3 id="request-verbs-delete"><a id="request--verbs--delete"></a>Request &gt; Verbs &gt; DELETE</h3>
+<p>O verbo <strong>DELETE</strong> é o responsável por deletar os registros. Semelhante ao GET, é usado em conjunto com uma URL com seus Path Parameters e/ou Query Strings para fazer filtro no conjunto que será afetado pelo DELETE.</p>
+<p>Caso a requisição seja em um recurso específico, o recurso será deletado, caso seja em uma coleção de recursos, toda a coleção será deletada, caso seja em um filtro (com Query Strings), todos os registros que correspondem ao filtro serão apagados.</p>
+<p>Ex:
+Com a URL com o formato <a href="http://api.exemplo.com/estados/%7BidEstado%7D/cidades/%7BidCidade%7D">http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}</a></p>
+<ul>
+<li><strong>DELETE</strong> <a href="http://api.exemplo.com/estados/sp/cidades?toPopulacao=5000">http://api.exemplo.com/estados/sp/cidades?toPopulacao=5000</a><br>
+Apaga todas as cidades com população até 5000 habitantes.</li>
+<li><strong>DELETE</strong> <a href="http://api.exemplo.com/estados/sp/cidades">http://api.exemplo.com/estados/sp/cidades</a><br>
+Apaga todas as cidades do estado de São Paulo.</li>
+<li><strong>DELETE</strong> <a href="http://api.exemplo.com/estados/sp/cidades/sorocaba">http://api.exemplo.com/estados/sp/cidades/sorocaba</a><br>
+Apaga a cidade de Sorocaba.</li>
+</ul>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--body">response body</a></sub></p>
+<h3 id="request-body"><a id="request--body"></a>Request &gt; Body</h3>
+<p>O envio de informações com o objetivo de filtrar informações existentes, se dá via Path Parameters e/ou Query Strings.</p>
+<p>Quando se utiliza os verbos POST, PUT ou PATCH, estamos enviando informações para serem persistidas no servidor. Neste caso, enviamos as informações no Body.</p>
+<p>O Body é o espaço da requisição HTTP onde se trafega as informações referentes ao recurso endereçado pela URL. Ao definir o contrato de uma REST API, cada recurso deve ser declarado como um conjunto de atributos com seus tipos definidos (números, datas, textos, booleanos etc), descrições, exemplos, obrigatoriedade etc. O Body trafega o conjunto destes atributos.</p>
+<p>Os atributos podem ser definidos em diversos formatos, os mais tradicionais são XML e <a href="[https://www.json.org/%5D(https://www.json.org/)">JSON</a>, sendo este o mais adotado atualmente.</p>
+<p>Ex:</p>
+<p>POST <a href="http://api.fabricacarros.com/carros">http://api.fabricacarros.com/carros</a></p>
+<pre><code>{
+  &quot;modelo&quot;: &quot;Kicknegade Freestyle HR AT&quot;,
+  &quot;cor&quot;: &quot;Branco Branquinho&quot;,
+  &quot;acessoriosExtras&quot;: [
+      {
+        &quot;id&quot;: &quot;senr002&quot;,
+        &quot;descricao&quot;: &quot;Sensor de ré&quot;
+      },
+      {
+        &quot;id&quot;: &quot;rck300f&quot;,
+        &quot;descricao&quot;: &quot;Rack de teto&quot;
+      },
+      {
+        &quot;id&quot;: &quot;filmc60&quot;,
+        &quot;descricao&quot;: &quot;Película protetora UV Cinza 60%&quot;
+      }
+    ],
+  &quot;valorTabela&quot;: 83590.00,
+  &quot;valorVenda&quot;: 82000.00,
+  &quot;adaptacaoPCD&quot;: false
+}
+</code></pre>
+<p>Quando se define o contrato da API deve-se atentar para que os atributos presentes do Body sejam relacionados apenas ao recurso definido na URL. Por exemplo, na API de cidades usada em outros exemplos neste guia, quando forem feitas chamadas para &quot;http://api.exemplo.com/estados&quot;, devem ser trabalhados apenas atributos que definam um estado; quando forem feitas chamadas para <a href="http://api.exemplo.com/estados/%7BidEstado%7D/cidades">http://api.exemplo.com/estados/{idEstado}/cidades</a> devem ser trabalhados apenas atributos que definam uma cidade.</p>
+<p>Ao definir os atributos do contrato da REST API, não existe um consenso de mercado quando ao tipo de caixa a ser adotada (maiúsculo, minúsculo etc), no entanto, dado que os atributos em algum momento serão associados às propriedades das classes nas linguagens de programação seja no servidor ou no cliente, é uma boa prática adotar o lowerCamelCase, dado que as principais linguagens de programação adotam esta caixa para as propriedades.</p>
+<p>Sobre os termos usados para definir os atributos, deve-se utilizar aqueles que melhor auto-descrevam o atributo, reduzindo a necessidade de consultas às documentações. Portanto, utilize as palavras por extenso, evitando abreviações, exceto para casos amplamente conhecidos como &quot;Id&quot; ou acrônimos como &quot;RG&quot;. Ainda assim, o padrão para uso de Acrônimos ou Abreviações é controverso. Dê uma lida neste fórum <a href="https://stackoverflow.com/questions/15526107/acronyms-in-camelcase">acronyms-in-camelcase</a> para comprovar a complexidade deste assunto.</p>
+<p>Também não se usa em REST APIs alguns padrões antigos de definição de variável com o tipo de dado no nome do atributo - por exemplo, dt, int, bool etc. - dado que os atributos tipos já tão tipados na definição do contrato.</p>
+<p>Exemplos dentro do padrão:</p>
+<ul>
+<li>&quot;id&quot;: &quot;12ed58r9&quot;</li>
+<li>&quot;nomeMae&quot;: &quot;Maria&quot;</li>
+<li>&quot;alertasNaoLidos&quot;: false</li>
+<li>&quot;cpf&quot;: &quot;33344455566&quot;</li>
+<li>&quot;RG&quot;: &quot;445556667&quot;</li>
+<li>&quot;casado&quot;: true</li>
+</ul>
+<p>Exemplos fora do padrão:</p>
+<ul>
+<li>&quot;Id&quot;: &quot;12ed58r9&quot;</li>
+<li>&quot;nome-mae&quot;: &quot;Maria&quot;</li>
+<li>&quot;possuialertasnaolidos&quot;: false</li>
+<li>&quot;possui_Alertas_Nao_Lidos&quot;: false</li>
+<li>&quot;flagPossuiAlertasNaoLidos&quot;: false</li>
+<li>&quot;indicadorDeAlertasNaoLidos&quot;: false</li>
+<li>&quot;int_id_cli&quot;: 123</li>
+<li>&quot;flag_casado&quot;: true</li>
+</ul>
+<p>Os tipos de atributos devem ser declarados e convencionados no contrato da REST API.
+As linguagens de definição de contrato como Swagger e RAML documentam os data types suportados: <a href="https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#raml-data-types">RAML DataTypes</a> e <a href="[https://swagger.io/docs/specification/data-models/data-types/%5D(https://swagger.io/docs/specification/data-models/data-types/)">Swagger Data Types</a>. E <a href="#tipos-de-dados">aqui</a> tem um resumo já agregando boas práticas.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--body">response body</a></sub></p>
+<h2 id="response"><a id="response"></a>Response</h2>
+<p>Após o envio de uma requisição à partir de um cliente, o servidor onde a API está localizada deve processar a requisição e gerar uma resposta (Response).</p>
+<p>No response, existem alguns padrões a serem seguidos e eles serão explicados um a um a seguir. Alguns são obrigatórios para o funcionamento da REST API, outros são boas práticas adotadas pelo mercado.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request">request</a></sub></p>
+<h3 id="response-headers"><a id="response--headers"></a>Response &gt; Headers</h3>
+<p>Assim como na requisição, o retorno da resposta pode trazer um conjunto de headers que são metadados ou informações técnicas sobre a comunicação que está sendo feita através daquela API.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--headers">request headers</a></sub></p>
+<h3 id="response-headers-content-type"><a id="response--headers--content-type"></a>Response &gt; Headers &gt; Content-Type</h3>
+<p>Assim como na requisição, o header <strong>Content-Type</strong> define qual é o formato da estrutura de dados presente no Body.</p>
+<p>Ex:  <strong>Content-Type</strong>: application/json</p>
+<p>Obs: Este header não é utilizado no DELETE, pois não é enviado no body de retorno.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--headers--content-type">request content type</a></sub></p>
+<h3 id="response-headers-content-location"><a id="response--headers--content-location"></a>Response &gt; Headers &gt; Content-Location</h3>
+<p>O header <strong>Content-Location</strong> expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe um determinado recurso.</p>
+<p>Quando uma requisição é feita com o verbo POST, por exemplo, o cliente ainda não sabe o Id do recurso que ele está criando: muitas vezes são identificadores gerados no momento da gravação. Assim, quando o servidor retorna a resposta, além de preencher a propriedade id no body da requisição, deve-se preencher o header Content-Location.</p>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>POST <a href="http://api.exemplo.com/estados/sp/cidades/">http://api.exemplo.com/estados/sp/cidades/</a></p>
+<pre><code>{
+   &quot;nome&quot;: &quot;São Vicente&quot;,
+   &quot;DDD&quot;: 13,
+   &quot;descrição&quot;: &quot;Primeira cidade do Brasil&quot;, 
+   &quot;populacao&quot;: 355542
+}
+</code></pre>
+<p><em>Response</em></p>
+<p>HTTP/1.1 201 Created</p>
+<p><strong>Content-Location</strong>: <a href="http://api.exemplo.com/estados/sp/cidades/saovic001">http://api.exemplo.com/estados/sp/cidades/saovic001</a></p>
+<pre><code>{
+   &quot;id&quot;: &quot;saovic001&quot;,
+   &quot;nome&quot;: &quot;São Vicente&quot;,
+   &quot;DDD&quot;: 13,
+   &quot;descrição&quot;: &quot;Primeira cidade do Brasil&quot;, 
+   &quot;populacao&quot;: 355542
+}
+</code></pre>
+<p>Obs: Não utilizado no DELETE, pois depois de um DELETE com sucesso, não existe mais o conteúdo.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="response-headers-location"><a id="response--headers--location"></a>Response &gt; Headers &gt; Location</h3>
+<p>O header Location expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe <strong>outra</strong> localização para um determinado recurso. Normalmente é utilizado em processamento assíncrono.</p>
+<p>Ex: <strong>Location</strong>: <a href="http://api.exemplo.com/contas/v1/tarefas/1">http://api.exemplo.com/contas/v1/tarefas/1</a></p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#processamento-ass%C3%ADncrono">processamento assíncrono</a></sub></p>
+<h3 id="response-body"><a id="response--body"></a>Response &gt; Body</h3>
+<p>Quando é feita uma requisição na API, na maioria das vezes, espera-se uma resposta com informações. Colocamos estas informações no Body. Assim como no Body do <a href="#request--body">request</a>, é recomendado utilizar lowerCamelCase para definir os atributos e JSON como padrão de notação.</p>
+<p>A resposta de uma requisição de gravação (POST, PUT, PATCH) não precisa necessariamente retornar o body com o recurso gravado. O critério para a decisão de retorná-lo ou não fica em ponderar se:</p>
+<ul>
+<li>Existe transformação da informação no momento da gravação e o cliente precisa saber, então devolve-se o recurso e gasta-se banda, log etc.</li>
+<li>Se não existe transformação da informação, então pode-se não enviar um body de retorno e economizar banda, log etc.</li>
+</ul>
+<p>Para DELETE, não se utiliza Body.</p>
+<p>Quando não se retorna nada no body de uma requisição que foi processada com sucesso, é importante atentar-se em usar o HTTP Status Code correto. Para GET, utiliza-se 200, para POST 204, PUT, PATCH ou DELETE 204. Leia mais sobre o <a href="#response--http-status-codes">HTTP Status Code 204</a> para mais informações.</p>
+<p>Quando são usados <a href="#request--verbs">verbos</a> que enviam body no request (POST, PUT e PATCH), é importante notar que o body de request e o de response não precisam ser idênticos. Há casos em que a criação de um recurso implica que se populem atributos do mesmo em tempo de criação. Um exemplo muito recorrente é o identificador (id) que normalmente é gerado pelo servidor e não precisa estar definido no body de request.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#tipos-de-dados">tipos de dados</a> | <a href="#request--body">request body</a></sub></p>
+<h3 id="response-body-envelope-data"><a id="response--body--envelope-&amp;quot;data&amp;quot;"></a>Response &gt; Body &gt; Envelope &quot;Data&quot;</h3>
+<p>Chamamos de <strong>envelope</strong> alguns <strong>atributos que separam conteúdos importantes na resposta</strong>. Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum tipo de envelope. Ex:</p>
+<pre><code>{
+   &quot;id&quot;: 123,
+   &quot;nome&quot;: &quot;Carlos&quot;,
+   &quot;data&quot;: &quot;2019-06-04&quot;
+}
+</code></pre>
+<p>No body de response, colocamos a informação do recurso dentro de um envelope &quot;data&quot;.  Esse separação é necessária porque no response podemos ter outros envelopes como pagination, messages, links, summary etc. Exemplo de Body de response:</p>
+<pre><code>{
+   &quot;data&quot;: [{
+      &quot;id&quot;: 123,
+      &quot;nome&quot;: &quot;Carlos&quot;,
+      &quot;data&quot;: &quot;2019-06-04&quot;
+      }],
+   &quot;pagination&quot;: {
+      &quot;page&quot;: 1,
+      &quot;limit&quot;: 10,
+      &quot;...&quot;: &quot;...&quot;
+   },
+   &quot;_links&quot;: {
+      &quot;...&quot;: &quot;...&quot;
+   }
+}
+</code></pre>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#tipos-de-dados">tipos de dados</a> | <a href="#request--body">request body</a></sub></p>
+<h3 id="response-body-recurso-unitario-array-ou-nenhum"><a id="response--body--recurso-unit&#225;rio-array-ou-nenhum"></a>Response &gt; Body &gt; Recurso unitário, array ou nenhum</h3>
+<p idpessoa="">Quando se faz uma requisição por um elemento com um ID especificado no Path Parameter, por exemplo, GET .../pessoas/, o retorno da resposta será um único elemento. Assim, coloca-se o recurso unitário diretamente no envelope &quot;data&quot;. Ex:</p>
+<p><em>Request</em></p>
+<p>GET .../pessoas/456</p>
+<p><em>Response</em></p>
+<p>HTTP/1.1 200 OK</p>
+<p>Content-Location: .../pessoas/456</p>
+<pre><code>{
+   &quot;data&quot;: {
+      &quot;id&quot;: 456,
+      &quot;nome&quot;: &quot;José&quot;,
+      &quot;data&quot;: &quot;2019-06-09&quot;
+   }
+}
+</code></pre>
+<p>Quando se faz uma requisição sem o ID, filtrando apenas com Query Strings, pode-se ter como retorno um ou mais elementos. Neste cenário, retornamos com um array do referido recurso (mesmo que só retorne um). Ex:</p>
+<p><em>Request</em></p>
+<p>GET .../pessoas?fromData=2019-06-01</p>
+<p><em>Response</em></p>
+<p>HTTP/1.1 200 Ok</p>
+<pre><code>{
+   &quot;data&quot;: [
+      {
+         &quot;id&quot;: 123,
+         &quot;nome&quot;: &quot;Carlos&quot;,
+         &quot;data&quot;: &quot;2019-06-04&quot;
+      },
+      {
+         &quot;id&quot;: 456,
+         &quot;nome&quot;: &quot;José&quot;,
+         &quot;data&quot;: &quot;2019-06-09&quot;
+      },
+      {
+         &quot;id&quot;: 789,
+         &quot;nome&quot;: &quot;Maria&quot;,
+         &quot;data&quot;: &quot;2019-07-12&quot;
+      }
+   ]
+}
+</code></pre>
+<p>Também é possível obter resposta vazia quando a busca não retorna nenhum resultado. No caso do GET, retorna-se um envelope &quot;data&quot; com o array vazio mais qualquer outro envelope que faça sentido naquela resposta. Ex:</p>
+<pre><code>{
+   &quot;data&quot;: [],
+   &quot;messages&quot;: [
+      {
+         &quot;...&quot;:&quot;...&quot;
+      }
+   ]
+}
+</code></pre>
+<p>Veja mais sobre o <a href="#response--http-status-codes">HTTP Status Code</a> 204 para mais informações.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#tipos-de-dados">tipos de dados</a> | <a href="#request--body">request body</a></sub></p>
+<h3 id="response-body-full-text-search"><a id="response--body--full-text-search"></a>Response &gt; Body &gt; Full text search</h3>
+<p>Quando é definido um query string para buscas gerais, o termo definido na busca deve ser aplicado como filtro em todos os campos pesquisáveis daquele recurso. Por exemplo, uma requisição com a seguinte estrutura GET <a href="http://api.empresarh.com/candidatos?q=Paulo">http://api.empresarh.com/candidatos?q=Paulo</a> deveria retornar um array de resultados como este:</p>
+<pre><code>{
+   &quot;data&quot;: [
+      {
+         &quot;id&quot;: &quot;87426&quot;,
+         &quot;nome&quot;: &quot;Paulo Ferreira de Araújo&quot;,
+         &quot;pai&quot;: &quot;José de Araújo&quot;,
+         &quot;mãe&quot;: &quot;Patrícia Silva Ferreira&quot;,
+         &quot;cidade&quot;: &quot;Santos&quot;,
+         &quot;...&quot;: &quot;...&quot;
+      },
+      {
+         &quot;id&quot;: &quot;87426&quot;,
+         &quot;nome&quot;: &quot;Américo Guedes Oliveira&quot;,
+         &quot;pai&quot;: &quot;Roberto Carvalho de Oliveira&quot;,
+         &quot;mãe&quot;: &quot;Maria José Oliveira&quot;,
+         &quot;cidade&quot;: &quot;São Paulo&quot;,
+         &quot;...&quot;: &quot;...&quot;
+      },
+      {
+         &quot;id&quot;: &quot;87426&quot;,
+         &quot;nome&quot;: &quot;Carla Mendes Pinheiros&quot;,
+         &quot;pai&quot;: &quot;Carlos Gosmes de Pinheiros&quot;,
+         &quot;mãe&quot;: &quot;Lívia de Paulo Pinheiros&quot;,
+         &quot;cidade&quot;: &quot;Vitória&quot;,
+         &quot;...&quot;: &quot;...&quot;
+      }
+   ]
+}
+</code></pre>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--url--query-strings--full-text-search">request  full text search</a> | <a href="#tipos-de-dados">tipos de dados</a> | <a href="#request--body">request body</a></sub></p>
+<h3 id="response-body-paginacao"><a id="response--body--pagina&#231;&#227;o"></a>Response &gt; Body &gt; Paginação</h3>
+<p>Toda REST API que retorne muitos registros deveria suportar paginação. A paginação reduz o tráfego de dados na rede e o tempo de processamento da API entregando listas menores de resultados por vez. Ainda porque, as interfaces que exibem as informações para os usuários costumam ter um espaço limitado, preenchendo gradativamente conforme o usuário &quot;rola&quot; o conteúdo ou &quot;avança a página&quot;.</p>
+<p>Sempre que se retorna um resultado paginado, utiliza-se o HTTP Status Code <strong>206 Partial Content</strong>. Além do envelope &quot;data&quot; com o resultado da requisição, deve-se criar um envelope &quot;<strong>pagination</strong>&quot; com as informações necessárias para permitir que o cliente se movimente entre as páginas.</p>
+<p>Existem algumas técnicas diferentes para fazer a paginação. Serão explicadas abaixo.</p>
+<h4 id="response-body-paginacao-range"><a id="response--body--pagina&#231;&#227;o--range"></a>Response &gt; Body &gt; Paginação &gt; Range</h4>
+<p>Uma das formas de se limitar a quantidade de registros retornados é através de um filtro em algum atributo que represente um intervalo. Assim, quando se recebe um filtro nas Query Strings, deve-se retornar o resultado respeitando os critérios do filtro.</p>
+<p>Por exemplo, em uma requisição GET .../...?fromId=3&amp;toId=6, possuindo o banco de dados uma coleção de 8 registros, e os ids sendo sequenciais, o retorno devem ser os registros 3, 4, 5 e 6:</p>
+<pre><code>{
+   &quot;data&quot;: [
+      {
+         &quot;id&quot;: 3,
+         &quot;...&quot;: &quot;...&quot;
+      },
+      {
+         &quot;id&quot;: 4,
+         &quot;...&quot;: &quot;...&quot;
+      },
+      {
+         &quot;id&quot;: 5,
+         &quot;...&quot;: &quot;...&quot;
+      },
+      {
+         &quot;id&quot;: 6,
+         &quot;...&quot;: &quot;...&quot;
+      }	
+   ]
+}
+</code></pre>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--url--query-strings--pagina%C3%A7%C3%A3o--range">request  range</a></sub></p>
+<h4 id="response-body-paginacao-page-e-limit"><a id="response--body--pagina&#231;&#227;o--page-e-limit"></a>Response &gt; Body &gt; Paginação &gt; Page e Limit</h4>
+<p>Quando se utiliza a abordagem de page e limit, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&amp;limit=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&amp;limit=3, possuindo o banco de dados uma coleção de 8 registros, o retorno deve ser os registros 4, 5 e 6 mais o envelope &quot;pagination&quot; com seguinte estrutura:</p>
+<pre><code>{
+	&quot;data&quot;: [
+		{
+			&quot;id&quot;: 4,
+			&quot;...&quot;: &quot;...&quot;
+		},
+		{
+			&quot;id&quot;: 5,
+			&quot;...&quot;: &quot;...&quot;
+		},
+		{
+			&quot;id&quot;: 6,
+			&quot;...&quot;: &quot;...&quot;
+		}
+	],
+	&quot;pagination&quot;:{
+		&quot;first&quot;: 1,
+		&quot;last&quot;: 3,
+		&quot;previous&quot;: 1,
+		&quot;next&quot;: 3,
+		&quot;page&quot;: 2,
+		&quot;isFirst&quot;: false,
+		&quot;isLast&quot;: false,
+		&quot;totalElements&quot;: 8
+	}
+}
+</code></pre>
+<p>Os campos são auto-explicativos, só é preciso atenção especial para definição do que é considerado a página inicial, se 0 ou 1. Por convenção, adotar o 1 vai fazer com que a paginação coincida com a paginação que normalmente é exibida na tela para o usuário.</p>
+<p>No caso do exemplo, para obtenção da página seguinte, o cliente faria a chamada GET .../...?page=3, conforme informado no atributo &quot;next&quot;.</p>
+<p>Também devem ser mantidos (repetidos) os Query Strings (filtros, ordenação etc.) que o cliente passar na requisição, ainda porque, caso o cliente altere o filtro, todo o envelope de paginação pode ter seus valores alterados.</p>
+<p>Quando se está na primeira página ou na última, os atributos &quot;previous&quot; e &quot;next&quot; devem ficar vazios.</p>
+<p>Muitas vezes, criamos APIs para sistemas legados e com isso, precisamos nos ajustar a comportamentos  já existentes, por conta disso, a paginação pode ter alguns variantes, por exemplo:</p>
+<ul>
+<li>O sistema pode informar a página, não por número, mas através de um ID, nestes casos, basta substituir a informação numérica do  &quot;previous&quot; e &quot;next&quot; por string.
+<ul>
+<li>Ex: GET .../...?page=fgg12d8bfb4567820c46</li>
+</ul>
+</li>
+<li>O sistema pode não ter a informação da quantidade total de registros (ex: totalElements e last),  dessa forma, não temos como devolver todas as propriedades. Neste caso, devolvemos apenas as que são possíveis de serem informadas.</li>
+</ul>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-limit">request  page e limit</a></sub></p>
+<h4 id="response-body-paginacao-top"><a id="response--body--pagina&#231;&#227;o--top"></a>Response &gt; Body &gt; Paginação &gt; Top</h4>
+<p>Quando se usa o query string <strong>top</strong> para limitar a quantidade de registros, o retorno deve trazer apenas a quantidade de registros definida no query string. Ex:</p>
+<p>GET .../...?top=3</p>
+<pre><code>{
+   &quot;data&quot;: [
+      {
+         &quot;id&quot;: 1,
+         &quot;...&quot;: &quot;...&quot;
+      },
+      {
+         &quot;id&quot;: 2,
+         &quot;...&quot;: &quot;...&quot;
+      },
+      {
+         &quot;id&quot;: 3,
+         &quot;...&quot;: &quot;...&quot;
+      }
+   ]
+}
+</code></pre>
+<p>No caso do exemplo, a API deve retornar apenas os 3 primeiros registros (recursos) da coleção.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--url--query-strings--pagina%C3%A7%C3%A3o--top">request top</a></sub></p>
+<h3 id="response-body-ordenacao"><a id="response--body--ordena&#231;&#227;o"></a>Response &gt; Body &gt; Ordenação</h3>
+<p>Quando se recebe uma solicitação contendo Query Strings de ordenação (<strong>sort</strong>), deve-se retornar os resultados respeitando os critérios da query.</p>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>GET .../pedidos?sort=dataPagamento:desc,dataPedido</p>
+<p><em>Response</em></p>
+<pre><code>{
+   &quot;data&quot;:[
+         {
+			&quot;id&quot;: 456985,
+			&quot;dataPagamento&quot;: &quot;2019-06-05&quot;,
+			&quot;dataPedido&quot;: &quot;2019-06-02&quot;,
+			&quot;...&quot;: &quot;...&quot;
+		},
+		{
+			&quot;id&quot;: 457231,
+			&quot;dataPagamento&quot;: &quot;2019-06-05&quot;,
+			&quot;dataPedido&quot;: &quot;2019-06-03&quot;,
+			&quot;...&quot;: &quot;...&quot;
+		},
+		{
+			&quot;id&quot;: 455125,
+			&quot;dataPagamento&quot;: &quot;2019-06-01&quot;,
+			&quot;dataPedido&quot;: &quot;2019-05-29&quot;,
+			&quot;...&quot;: &quot;...&quot;
+		}
+	]
+}
+</code></pre>
+<p>No exemplo acima, o retorno está ordenado primeiramente de forma decrescente pela dataPagamento, seguido de dataPedido de forma ascendente.
+Ordernar de forma ascendente é o comportamento padrão quando a forma de ordenação não for declarada.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--url--query-strings--ordena%C3%A7%C3%A3o">request  ordenação</a></sub></p>
+<h3 id="response-body-fields"><a id="response--body--fields"></a>Response &gt; Body &gt; Fields</h3>
+<p>Quando uma requisição vem com a Query String <strong>fields</strong>, o body de retorno deve trazer apenas os atributos definidos na Query String.</p>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>GET <a href="https://api.lojaexemplo.com/clientes/jose-da-silva123/endere%C3%A7os/residencial-1?fields=nome,situacao,logradouro.rua,logradouro.numero">https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial-1?fields=nome,situacao,logradouro.rua,logradouro.numero</a></p>
+<p><em>Response</em></p>
+<p>HTTP/1.1 200 OK</p>
+<pre><code>{
+   &quot;data&quot;: {
+      &quot;nome&quot;: &quot;Residencial&quot;,
+      &quot;situacao&quot;: &quot;ativo&quot;,
+      &quot;logradouro&quot;: {
+         &quot;rua&quot;: &quot;Rua das Oliveiras&quot;,
+         &quot;numero&quot;: &quot;123&quot;
+      }   
+   }
+}
+</code></pre>
+<p>Enquanto uma chamada ao mesmo recurso sem o fields, deve retornar o recurso com todos os seus atributos.</p>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>GET
+<a href="https://api.lojaexemplo.com/clientes/jose-da-silva123/endere%C3%A7os/residencial-1">https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial-1</a></p>
+<p><em>Response</em></p>
+<p>HTTP/1.1 200 OK</p>
+<pre><code>{
+   &quot;data&quot;: {
+      &quot;nome&quot;: &quot;Residencial&quot;,
+      &quot;situacao&quot;: &quot;ativo&quot;,
+      &quot;dataAtualizacao&quot;: &quot;2019-07-17T19:27:00-03:00&quot;,
+      &quot;logradouro&quot;: {
+         &quot;cep&quot;: &quot;11001253&quot;
+         &quot;rua&quot;: &quot;Rua das Oliveiras&quot;,
+         &quot;numero&quot;: &quot;123&quot;,
+         &quot;complemento&quot;: &quot;Apto 18&quot;,
+         &quot;cidade&quot;: &quot;Santos&quot;,
+         &quot;uf&quot;: &quot;São Paulo&quot;
+      }   
+   }
+}
+</code></pre>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--url--query-strings--fields">request fields</a></sub></p>
+<h3 id="response-body-views"><a id="response--body--views"></a>Response &gt; Body &gt; Views</h3>
+<p>Quando a requisição recebe o query string <strong>view</strong>, o response deve devolver apenas os atributos convencionados (e documentados) como pertencentes àquela view.</p>
+<p>Ex:</p>
+<ul>
+<li>GET .../cartoes/a7834dcG456?view=basico</li>
+</ul>
+<p><em>Response</em></p>
+<pre><code>{
+   &quot;data&quot;: {
+      &quot;id&quot;: &quot;a7834dcG456&quot;,
+      &quot;status&quot;: &quot;válido&quot;,
+      &quot;produto&quot;: &quot;Platinum&quot;,
+      &quot;bandeira&quot;: &quot;mastercard&quot;,
+      &quot;numero&quot;: &quot;5461********7965&quot;
+  }
+}
+</code></pre>
+<ul>
+<li>GET .../cartoes/a7834dcG456?view=limites</li>
+</ul>
+<p><em>Response</em></p>
+<pre><code>{
+   &quot;data&quot;: {
+      &quot;id&quot;: &quot;a7834dcG456&quot;,
+      &quot;status&quot;: &quot;válido&quot;,
+      &quot;limites&quot;: {
+         &quot;contratado&quot;: 8000,
+	     &quot;usado&quot;: 2500,
+	     &quot;disponivel&quot;: 5500
+      }
+   }
+}
+</code></pre>
+<ul>
+<li>GET .../cartoes/a7834dcG456</li>
+</ul>
+<p><em>Response</em></p>
+<pre><code>{
+   &quot;data&quot;: {
+      &quot;id&quot;: &quot;a7834dcG456&quot;,
+      &quot;status&quot;: &quot;válido&quot;,
+      &quot;produto&quot;: &quot;Platinum&quot;,
+      &quot;bandeira&quot;: &quot;mastercard&quot;,
+      &quot;numero&quot;: &quot;5461********7965&quot;,
+      &quot;dataMelhorCompra&quot;: {
+         &quot;data&quot;: &quot;2016-02-28&quot;,
+         &quot;quantidadeDiasParaPagar&quot;: 12
+      },
+      &quot;limites&quot;: {
+         &quot;contratado&quot;: 8000,
+         &quot;usado&quot;: 2500,
+         &quot;disponivel&quot;: 5500
+      }
+   } 
+}
+</code></pre>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--url--query-strings--views">request  views</a></sub></p>
+<h3 id="response-body-expand"><a id="response--body--expand"></a>Response &gt; Body &gt; Expand</h3>
+<p>Quando a requisição traz um query string <strong>expand</strong>, o body deverá retornar o recurso definido na URL mais os recursos definidos no expand aninhados no recurso principal.</p>
+<p>Ex:</p>
+<p>Sendo uma API com o formato</p>
+<p idcartao="">GET .../cartoes/ e</p>
+<p idcartao="" idfatura="">GET .../cartoes//faturas/</p>
+<p><em>Request</em></p>
+<p>GET .../cartoes/a7834dcG456?expand=faturas&amp;faturas.id=ago18</p>
+<p><em>Response</em></p>
+<pre><code>{
+	&quot;data&quot;: {
+	  &quot;id&quot;: &quot;a7834dcG456&quot;,
+	  &quot;status&quot;: &quot;válido&quot;,
+	  &quot;produto&quot;: &quot;Platinum&quot;,
+	  &quot;bandeira&quot;: &quot;mastercard&quot;,
+	  &quot;numero&quot;: &quot;5461********7965&quot;,
+	  &quot;dataMelhorCompra&quot;: {
+	    &quot;data&quot;: &quot;2016-02-28&quot;,
+	    &quot;quantidadeDiasParaPagar&quot;: 12
+	  },
+	  &quot;limites&quot;: {
+		  &quot;contratado&quot;: 8000,
+		  &quot;usado&quot;: 2500,
+		  &quot;disponivel&quot;: 5500
+	  },
+	  &quot;faturas&quot;: [
+		  {
+			  &quot;id&quot;: &quot;ago18&quot;,
+			  &quot;valorMinimo&quot;: 178.96,
+			  &quot;valorTotal&quot;: 726.31,
+			  &quot;dataVencimento&quot;: &quot;2019-07-17&quot;
+		  }
+	  ]
+	}
+}
+</code></pre>
+<p>Observe que o conteúdo até o atributo limites são atributos do recurso cartão, no atributo faturas, é retornado o array de faturas como se tivesse havido uma chamada ao recurso .../cartoes/a7834dcG456/faturas/ago18.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--url--query-strings--expand">request  expand</a></sub></p>
+<h3 id="response-body-errors-e-warnings"><a id="response--body--errors-e-warnings"></a>Response &gt; Body &gt; Errors e Warnings</h3>
+<h4 id="errors"><a id="errors"></a>Errors</h4>
+<p>Quando ocorrem requisições cujo retorno seja um erro (<a href="#response--http-status-codes">HTTP Status Code</a> 5xx e 4xx), o body deve retornar o detalhamento do erro. Neste caso, não são retornados os envelopes relacionados às requisições bem sucedidas como &quot;data&quot;, &quot;pagination&quot;, &quot;links&quot; etc.
+O detalhamento do erro, é algo mais do que simplesmente o que o HTTP Status Code já expressa por si, mesmo. Ele deve ser suficiente para que o cliente entenda o que aconteceu e saiba o que fazer diante daquele problema.</p>
+<p>Ex:</p>
+<p>HTTP/1.1 422 Unprocessable Entity</p>
+<pre><code>{
+   &quot;code&quot;: &quot;ER0059&quot;,
+   &quot;message&quot;: &quot;Operação não permitida fora do horário comercial.&quot;,
+   &quot;details&quot;: &quot;https://developer.empresa.com/apis/cartoes/erros/ER0059&quot;
+}
+</code></pre>
+<p>Quando a API retorna HTTP Status Code 400 e 422, muito provavelmente o erro foi causado por algum atributo específico. Nestes casos, deve-se especificar as informações sobre cada um dos atributos envolvidos no erro.</p>
+<p>HTTP/1.1 Status Code 400 Bad Request</p>
+<pre><code>{
+   &quot;code&quot;: &quot;10023&quot;,
+   &quot;message&quot;: &quot;Alguns campos estão preenchidos incorretamente.&quot;,
+   &quot;details&quot;: &quot;https://developer.empresa.com/apis/erros/10023&quot;,
+   &quot;fields&quot;:[
+      {
+         &quot;name&quot;: &quot;dataPedido&quot;,
+         &quot;message&quot;: &quot;O formato de data é inválido. Utilize data no padrão yyyy-MM-DD.&quot;,
+         &quot;value&quot;: &quot;01-05-2019&quot;,
+         &quot;details&quot;: &quot;https://developer.empresa.com/apis/erros/err-gen-086&quot;
+      },
+      {
+         &quot;name&quot;: &quot;valorPagamento&quot;,
+         &quot;message&quot;: &quot;Valor não é number.&quot;,
+         &quot;value&quot;: &quot;R$ 27.568,90&quot;,
+         &quot;details&quot;: &quot;https://developer.empresa.com/apis/erros/err-gen-073&quot;
+      }
+   ]
+}
+</code></pre>
+<h4 id="warnings"><a id="warnings"></a>Warnings</h4>
+<p>Durante requisições com retorno de sucesso (<a href="#response--http-status-codes">HTTP Status Code</a> 2xx e 3xx) pode haver situações que um alerta deve ser enviado ao cliente. Por exemplo, alertar que uma transação no cartão de crédito atingiu o 80% do limite disponível ou até mesmo, tendo atingido o limite do cartão, alertar que será cobrada uma taxa pelo uso do limite emergencial.</p>
+<p>O alerta se dá através de um envelope <strong>messages</strong> com a estrutura semelhante às das mensagens de erro.</p>
+<p>Ex:</p>
+<p>HTTP/1.1 201 Created</p>
+<pre><code>{
+   &quot;data&quot;:{
+      &quot;...&quot;: &quot;...&quot;
+   },
+   &quot;messages&quot;: [
+      {
+         &quot;code&quot;: &quot;CT0056&quot;,
+         &quot;message&quot;: &quot;Limite do cartão ultrapassou 80%.&quot;
+      }
+   ]
+}
+</code></pre>
+<p>O atributo &quot;atributos&quot; não é obrigatório e neste cenário, no entanto, nos casos que fizer sentido, informá-los pode ajudar o cliente a entender mais especificamente o que provocou o alerta.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#response--http-status-codes">http status codes</a></sub></p>
+<h3 id="response-body-hateoas"><a id="response--body--hateoas"></a>Response &gt; Body &gt; HATEOAS</h3>
+<p><strong>H</strong>ypermedia <strong>A</strong>s <strong>T</strong>he <strong>E</strong>ngine <strong>O</strong>f <strong>A</strong>pplication <strong>S</strong>tate (HATEOAS) é uma dos pilares da arquitetura REST pela qual um cliente pode interagir com a API através de links informados pelo servidor. Assim, simplesmente fazendo requisições aos recursos, o cliente vai &quot;descobrindo&quot; as opções disponíveis sem ter de estudar uma documentação, proporcionando uma maneira de fazer os protocolos auto-documentados.</p>
+<p>A implementação é a disponibilização de um envelope <strong>links</strong> na resposta de um recurso.</p>
+<p>Por exemplo, em um serviço de consulta de cartões, podemos informar ao cliente que ele também pode consultar as transações, faturas e contratar novos cartões adicionais.</p>
+<p>Ex:</p>
+<pre><code>{
+   &quot;data&quot;: {
+      &quot;id&quot;: &quot;a7834dcG456&quot;,
+      &quot;status&quot;: &quot;válido&quot;,
+      &quot;produto&quot;: &quot;Platinum&quot;,
+      &quot;bandeira&quot;: &quot;mastercard&quot;,
+      &quot;numero&quot;: &quot;5461********7965&quot;,
+      &quot;dataMelhorCompra&quot;: {
+         &quot;data&quot;: &quot;2016-02-28&quot;,
+         &quot;quantidadeDiasParaPagar&quot;: 12
+      }
+   },
+   &quot;links&quot;:[
+      {
+         &quot;rel&quot;: &quot;faturas&quot;,
+         &quot;href&quot;: &quot;/cartoes/a7834dcG456/faturas&quot;,
+         &quot;title&quot;: &quot;Retorna todas as faturas&quot;,
+         &quot;method&quot;: &quot;GET&quot;
+      },
+      {
+         &quot;rel&quot;: &quot;adicionais&quot;,
+         &quot;href&quot;: &quot;/cartoes/a7834dcG456/adicionais&quot;,
+         &quot;title&quot;: &quot;Retorna a lista de cartões adicionais&quot;,
+         &quot;method&quot;: &quot;GET&quot;
+      },
+      {
+         &quot;rel&quot;: &quot;upgrade&quot;,
+         &quot;href&quot;: &quot;/cartoes/a7834dcG456/ofertas-upgrade&quot;,
+         &quot;title&quot;: &quot;Retorna a lista de ofertas para fazer upgrade do cartão.&quot;,
+         &quot;method&quot;: &quot;GET&quot;
+      }
+   ]
+}
+</code></pre>
+<p>Apesar de existir propostas para o formato da declaração dos hyperlinks como o <a href="https://en.wikipedia.org/wiki/Hypertext_Application_Language">HAL</a>, não há uma rigidez quanto à adoção do padrão. Por simplicidade de facilidade de entendimento, o padrão do exemplo expõe bem os links relacionados.</p>
+<p>Com o uso de HATEOAS, o cliente pode implementar funcionalidades na tela, conforme resposta do servidor, por exemplo, associando exibição ou não de itens de menu ao retorno ou não de links no HATEOAS. Assim, como, permite que o servidor altere o caminho das URLs de forma dinâmica, sem impactar o cliente.</p>
+<p>A adoção do HATEOAS atinge o nível mais alto no <a href="https://martinfowler.com/articles/richardsonMaturityModel.html">Richardson Maturity Model</a>.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="response-http-status-codes"><a id="response--http-status-codes"></a>Response &gt; HTTP Status Codes</h3>
+<p>No HTTP existem os <a href="#[https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status%5D(https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status)">códigos de status</a>. Eles, de forma padronizada, reportam se a requisição foi processada com sucesso ou não. Existem vários HTTP Status Codes e nem todos são adotados pelo mercado para uso com REST.</p>
+<p>Basicamente, os códigos de resposta são agrupados: 1xx, 2xx, 3xx, 4xx e 5xx. Abaixo, seguem os mais usuais.</p>
+<p><strong>Grupo 1xx</strong></p>
+<p>Este é o grupo de status que dá respostas informativas. Respostas com este status são raramente utilizadas. Por isso, não listo nenhum deste grupo aqui.</p>
+<p><strong>Grupo 2xx</strong></p>
+<p>Os códigos deste grupo são usado em caso de sucesso na requisição. Os mais utilizados são:</p>
+<ul>
+<li><p><strong>200 OK</strong>:  Código mais utilizado e que indica que a requisição foi processada com sucesso. Esta resposta pode ser usada em todos os verbos. Os dados solicitados serão retornados no Body.</p>
+</li>
+<li><p><strong>201 Created</strong>:  Indica que a requisição foi bem sucedida e que um novo recursos foi criado como resultado. Esta resposta é utilizada em requisições do método POST.</p>
+</li>
+<li><p><strong>202 Accepted</strong>:	O recurso será atualizado/criado de forma assíncrona. Veja <a href="#processamento-ass%C3%ADncrono">processamento assíncrono</a> para mais detalhes.</p>
+</li>
+<li><p><strong>204 No Content</strong>: A requisição aconteceu com sucesso, no entanto, não há body na resposta. O 204 não é utilizado para o verbo GET. Nos casos de GET cujos critérios na requisição provocaram uma resposta vazia, utilizamos o HTTP code 200 com o envelope &quot;data&quot; vazio.</p>
+</li>
+<li><p><strong>206 Partial Content</strong>: O servidor encontrou uma uma grande quantidade de registros na respostas e devolveu de forma paginada. A resposta inclui um envelope &quot;pagination&quot; com informações sobre a paginação.</p>
+</li>
+</ul>
+<p><strong>Grupo 3xx</strong></p>
+<p>Este grupo define respostas de redirecionamento. Servem para informar o cliente sobre mudanças na requisição e redirecionamento para uma nova URL. Para saber mais sobre estes Status Codes, veja <a href="#processamento-ass%C3%ADncrono">requisições assíncronas</a>. Os mais utilizados são:</p>
+<ul>
+<li><p><strong>301 Moved Permanently</strong>: Informa que o recurso foi definitivamente movido para uma outra URL definida no header <strong>Location</strong>.</p>
+</li>
+<li><p><strong>303 See Other</strong>: A resposta para a requisição encontra-se em outra URL definida no header <strong>Location</strong>. Veja <a href="#processamento-ass%C3%ADncrono">processamento assíncrono</a> para mais informações.</p>
+</li>
+<li><p><strong>304 Not Modified</strong>:  Resposta utilizada quando o recurso está em <a href="#performance-cache-e-compress%C3%A3o">cache</a>, informando ao cliente que a resposta não foi modificada, e que o cliente pode usar a mesma versão em cache da resposta.</p>
+</li>
+<li><p><strong>307 Temporary redirect</strong>:  Se trata de um redirecionamento de uma página para outro endereço, porém que é com caráter temporário, e não permanente. Provavelmente por conta de alguma manutenção no sistema.</p>
+</li>
+</ul>
+<p><strong>Grupo 4xx</strong></p>
+<p>Esse grupo informa os erros cometidos pelo cliente durante o request. São eles:</p>
+<ul>
+<li><p><strong>400 Bad Request</strong>: Significa que o servidor não consegue entender a requisição, pois existe uma sintaxe ou estrutura inválida, pode ser caracteres não permitidos na URL, falta de cabeçalhos obrigatórios, cabeçalhos mal formados, falta de Query Strings obrigatórias, falta de atributos obrigatórios, body com estrutura inválida etc.</p>
+</li>
+<li><p><strong>401 Unauthorized</strong>: A camada de segurança do recurso solicitado ao servidor, apontou que não está sendo utilizada as credenciais corretas nessa requisição (token, por exemplo). É um erro de <a href="#seguran%C3%A7a">autenticação</a>.</p>
+</li>
+<li><p><strong>403 Forbidden</strong>: As credenciais (token) estão corretas, mas o usuário não tem permissão para acessar aquele recurso. É um erro de <a href="#seguran%C3%A7a">autorização</a>.</p>
+</li>
+<li><p><strong>404 Not Found</strong>: O servidor não encontrou o recurso solicitado pelo cliente. Provavelmente a URL está mau formada ou está sendo feita a busca com um Path Parameter inválido.
+Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não exista.</p>
+</li>
+<li><p><strong>405 Method Not Allowed</strong>: O recurso (URL) existe mas o verbo usado não foi definido para ela. Em algumas situações em que o sistema usa feature toggle e a API precisa ser desabilitada, pode-se também utilizar o 405 para notificar o cliente de que o método não está disponível.</p>
+</li>
+<li><p><strong>410 Gone</strong>: O recurso (URL) não existe mais e esta condição é permanente. Este status é usado quando um recurso que um dia existiu não existe mais. Ao contrário do 404 em que o recurso pode nunca ter existido ou ele está temporariamente indisponível.</p>
+</li>
+<li><p><strong>414 URI Too Long</strong>: O tamanho da URL pode ser limitado pelo servidor. Assim, este erro é lançado quando uma URL ultrapassa o tamanho máximo permitido. <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/414">+ info</a></p>
+</li>
+<li><p><strong>418 I'm a teapot</strong>: O servidor se recusa a servir um café porque o bule é de chá. Código de resposta do Hyper Text Coffee Pot Control Protocol (<a href="https://tools.ietf.org/html/rfc2324#section-2.3.2">HTCPCP/1.0</a>).  Este código é só uma brincadeira de primeiro de abril. :-) <a href="https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error">+ info</a></p>
+</li>
+<li><p><strong>422 Unprocessable Entity</strong>:	Ocorre quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida para uma determinada ação, ou uma requisição de transferência financeira é feita e a conta não tem fundo etc.</p>
+</li>
+<li><p><strong>428 Precondition Required</strong>: O servidor exige que a requisição seja condicional usando um dos headers disponíveis para isso. Caso o a condição falhe, devolve-se um <strong>412 Precondition Failed</strong>. Conheça mais sobre este tipo de requisição <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests">aqui</a> e <a href="#performance-cache-e-compress%C3%A3o">aqui</a>.</p>
+</li>
+<li><p><strong>429 Too Many Requests</strong>: Informa ao cliente que ele excedeu o limite permitido de requisições. Leia sobre <a href="#seguran%C3%A7a">segurança</a> para entender mais sobre este código de retorno.</p>
+</li>
+</ul>
+<p><strong>Grupo 5xx</strong></p>
+<p>São códigos que retornam erros que aconteceram por culpa do servidor. Ou seja, a requisição foi feita corretamente pelo cliente, porém ocorreu um erro no servidor. São eles:</p>
+<ul>
+<li><p><strong>500 Internal Server Error</strong>: Erro mais genérico para informar que o servidor encontrou um cenário inesperado de erro que não soube tratar, e por isso não conseguiu retornar uma resposta na requisição do cliente.</p>
+</li>
+<li><p><strong>501 Not Implemented</strong>: O verbo HTTP não foi disponibilizado na API ou a URL informada não existe, não por conta de Path Parameters inválidos, mas por conta de ter um recurso ainda não implementado. Normalmente isto acontece quando existe a previsão de se fazer a implementação em breve, mas versão atual ainda não suporta.</p>
+</li>
+<li><p><strong>503 Service Unavailable</strong>: O servidor não está respondendo por que está fora do ar, em manutenção ou sobrecarregado. É um problema temporário.</p>
+</li>
+<li><p><strong>504 Gateway Timeout</strong>: O servidor, enquanto atuando como gateway ou proxy, não conseguiu responder em tempo.</p>
+</li>
+</ul>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h3 id="response-exemplos-de-uso-dos-http-status-codes"><a id="response--exemplos-de-uso-dos-http-status-codes"></a>Response &gt; Exemplos de uso dos HTTP Status Codes</h3>
+<p>Tendo conhecido os HTTP Status Codes, é preciso definí-los nos diferentes cenários das possíveis respostas ao chamar um serviço. Em alguns cenários não é tão óbvio qual deles utilizar. É comum acontecer alguma confusão entre o 200, 201, 204, 400 e 404 principalmente em retornos vazios. Por conta disso, neste capítulo deixo alguns exemplos para referência.</p>
+<p>Imagine que o sistema tem a seguinte massa de dados:</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>nome</th>
+<th>id-estado</th>
+<th>estado</th>
+<th>id-pais</th>
+<th>pais</th>
+<th>populacao</th>
+<th>outras-informacoes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100</td>
+<td>Santos</td>
+<td>11</td>
+<td>São Paulo</td>
+<td>55</td>
+<td>Brasil</td>
+<td>10000</td>
+<td>...</td>
+</tr>
+<tr>
+<td>200</td>
+<td>São Vicente</td>
+<td>11</td>
+<td>São Paulo</td>
+<td>55</td>
+<td>Brasil</td>
+<td>20000</td>
+<td>...</td>
+</tr>
+<tr>
+<td>300</td>
+<td>Belo Horizonte</td>
+<td>31</td>
+<td>Minas Gerais</td>
+<td>55</td>
+<td>Brasil</td>
+<td>30000</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<p>Abaixo, seguem alguns dos diversos cenários de requisições e os principais tipos de respostas HTTP:</p>
+<ul>
+<li><strong>GET .../paises/55/estados/11/cidades/100</strong>
+<ul>
+<li>Resposta HTTP 200 Ok com o retorno da cidade Santos.</li>
+</ul>
+</li>
+<li><strong>GET .../paises/55/estados/11/cidades</strong>
+<ul>
+<li>Resposta HTTP 200 Ok com um array com as cidades Santos e São Vicente.</li>
+</ul>
+</li>
+<li><strong>GET .../paises/55/estados/11/cidades?nome=Belo%20Horizonte</strong>
+<ul>
+<li>Resposta HTTP 200 Ok com um array com a cidade Belo Horitonte. Repare que o retorno é um array, pois a busca foi feita via query strings, não via ID (path parameter) em que teríamos a certeza de que o retorno é de uma só entidade. Quando a busca vem via query strings, podemos ter cenários em que pode vir mais de um item no retorno e, mesmo que a situação atual da API retorne apenas 1 item, é melhor manter o comportamento de retornar array, pois no futuro é possível adicionar novas query strings que poderão alterar a quantidade de resultados.</li>
+</ul>
+</li>
+<li><strong>GET .../paises/55/estados/11/cidades?fromPopulacao=30000</strong>
+<ul>
+<li>Resposta HTTP 200 Ok com um array com a cidade Belo Horitonte. E o retorno é um array como já explicado acima.</li>
+</ul>
+</li>
+<li><strong>POST .../paises/55/estados/11/cidades</strong>
+<ul>
+<li>Resposta HTTP 201 Created, registrando uma nova cidade no banco de dados.</li>
+</ul>
+</li>
+<li><strong>PUT .../paises/55/estados/11/cidades/100</strong>
+<ul>
+<li>Resposta HTTP 204 No Content, caso não retorne a cidade Santos atualizada após gravar no banco de dados.</li>
+</ul>
+</li>
+<li><strong>PUT .../paises/55/estados/11/cidades/100</strong>
+<ul>
+<li>Resposta HTTP 200 Ok, caso retorne a cidade Santos como resposta após gravar no banco de dados.</li>
+</ul>
+</li>
+<li><strong>GET .../paises/10/estados/11/cidades/100</strong>
+<ul>
+<li>Resposta HTTP 404 NotFound porque a URL não existe, dado que não existe o país com código 10 que foi passado como Path Parameter. O erro foi do chamador que acessou diretamente um ID que não existe, formando um URL inexistente.</li>
+</ul>
+</li>
+<li><strong>GET .../paises/55/estados/11/cidades/999</strong>
+<ul>
+<li>Resposta HTTP 404 NotFound porque a URL não existe, dado que não existe a cidade com código 999 que foi passada como Path Parameter. O erro foi do chamador que acessou diretamente um ID que não existe, formando um URL inexistente.</li>
+</ul>
+</li>
+<li><strong>GET .../paises/55/estados/11/cidade/100</strong>
+<ul>
+<li>Resposta HTTP 404 NotFound porque a URL não existe, dado que na URL não existe o termo &quot;cidade&quot; no singular. O erro foi do chamador da API.</li>
+</ul>
+</li>
+<li><strong>GET .../paises/55/estados/11/cidades?nome=Guarulhos</strong>
+<ul>
+<li>Resposta HTTP 200 Ok com um array vazio, dado que não existe a cidade com nome Guarulhos. Não houve erros em nenhuma das partes porque a busca por Query Parameters é um filtro e é perfeitamente aceitável filtros que não dêem match com nenhum registro na base.</li>
+</ul>
+</li>
+<li><strong>GET .../paises/55/estados/11/cidades?nome-prefeito=Maria</strong>
+<ul>
+<li>Resposta HTTP 400 Bad Request porque não foi implementado um filtro (query parameter) chamado nome-prefeito. O erro foi do usuário.</li>
+</ul>
+</li>
+</ul>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h2 id="tipos-de-dados"><a id="tipos-de-dados"></a>Tipos de dados</h2>
+<p>No body da requisição, trafegam-se dados estruturados. No JSON (notação mais usada para isso), são definidos os seguintes tipos de dados: string, number, object, array, boolean, null. Datas, por exemplo, são trafegadas como strings, logo é necessário adotar alguns padrões para o formato delas, geralmente respeitando ISOs.</p>
+<p>Abaixo, seguem algumas formatações padrões para os tipos de dados:</p>
+<table>
+<thead>
+<tr>
+<th>Tipo de dado</th>
+<th>Descrição</th>
+<th>Exemplos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Date</td>
+<td>String com formato <a href="https://pt.wikipedia.org/wiki/ISO_8601">ISO 8601</a>.<br> - ano (YYYY),<br>- ano e mês (YYYY-MM)<br>- ano, mês e dia (YYYY-MM-DD)</td>
+<td>2016<br>2016-02<br>2016-02-26</td>
+</tr>
+<tr>
+<td>Timestamp</td>
+<td>String com formato <a href="https://www.w3.org/TR/NOTE-datetime">ISO 8601</a><br>(YYYY-MM-DDThh:mm:ss.sTZD)</td>
+<td>2019-02-21T19:00:00Z (para UTC)<br>2019-02-21T19:21:32.285Z (com milissegundos)<br>2019-02-21T19:00:00-03:00 (para UTC-3)<br>ou 2019-02-21T19:00:00+01:00 (para UTC+1)<br></td>
+</tr>
+<tr>
+<td>Object</td>
+<td>Objetos que definem conjuntos de atributos</td>
+<td>{<br> &quot;documento&quot;: {<br>  &quot;tipo&quot;: &quot;rg&quot;,<br>  &quot;numero&quot;: &quot;443335556&quot;<br> }<br>}</td>
+</tr>
+<tr>
+<td>String</td>
+<td>Cadeia de texto</td>
+<td>“texto de exemplo”</td>
+</tr>
+<tr>
+<td>Number</td>
+<td>Valores numéricos inteiros e decimais com separação de decimal usando &quot;.&quot; (ponto)</td>
+<td>1.25</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>Define os valores true ou false</td>
+<td>true</td>
+</tr>
+<tr>
+<td>Array</td>
+<td>Lista de objetos de um dos tipos anteriores</td>
+<td>[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</td>
+</tr>
+<tr>
+<td>null</td>
+<td>Valores nulos</td>
+<td>null</td>
+</tr>
+<tr>
+<td>Moeda</td>
+<td>String com formato <a href="https://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a></td>
+<td>EUR (Euro Member Countries)<br>USD (United State Dollar)<br>BRL (Brazillian Real)</td>
+</tr>
+<tr>
+<td>Idiomas</td>
+<td>String com o formato <a href="https://en.wikipedia.org/wiki/Lists_of_ISO_639_codes">ISO 693</a></td>
+<td>por (Portuguese)<br>eng (English)<br>spa (Spanish)</td>
+</tr>
+<tr>
+<td>Países</td>
+<td>String com o formato <a href="https://en.wikipedia.org/wiki/ISO_3166">ISO 3166-2</a></td>
+<td>BR (Brasil)<br>PT (Portugal)</td>
+</tr>
+</tbody>
+</table>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a> | <a href="#request--body">body</a></sub></p>
+<h2 id="processamento-assincrono"><a id="processamento-ass&#237;ncrono"></a>Processamento Assíncrono</h2>
+<p>O HTTP é um protocolo síncrono, logo, quando um cliente faz uma requisição, ele recebe uma resposta e encerra-se o ciclo.</p>
+<p>No entanto, em determinadas situações os servidores não processam as requisições de forma imediata, seja porque o processamento necessita de mais tempo do que o habitual, ou porque estará esperando que chegue a sua vez para ser executado, ou ainda porque depende de um agendamento batch para completar a operação.</p>
+<p>Para dar um comportamento assíncrono em um protocolo síncrono, existem duas técnicas muito adotadas: <strong>pooling</strong> e <strong>webhook</strong>. No pooling, o cliente consulta o estado do andamento do processamento de tempos em tempos até encerrar. No webhook, o cliente fornece um endereço de retorno para a API e a API faz uma chamada neste endereço ao terminar o processamento. Nesse caso, o cliente tem que ser também um servidor para poder hospedar este endereço.</p>
+<p>Implementar as duas técnicas ao mesmo tempo na API traz mais flexibilidade aos clientes, pois existem cenários para uso de cada uma delas.</p>
+<p>Assim, quando processamentos deste tipo são expostos via API, eles seguem alguns passos a mais:</p>
+<ol>
+<li>Na primeira requisição, o cliente receberá como resposta um HTTP Status Code <strong>202 - Accepted</strong>. Ou seja, a requisição foi aceita, mas ainda não foi processada. E será informado no header <a href="#response--headers--location">Location</a> uma URL onde é possível consultar o andamento deste processamento.</li>
+</ol>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>POST  <a href="http://api.exemplo.com/contas/v1/contas">http://api.exemplo.com/contas/v1/contas</a></p>
+<pre><code>{
+	&quot;agencia&quot;: 2153,
+	&quot;cliente&quot;: &quot;José da Silva&quot;,
+	&quot;...&quot;: &quot;...&quot;
+}
+</code></pre>
+<p><em>Response</em></p>
+<p>HTTP/1.1 202 Accepted</p>
+<p>Location: <a href="http://api.exemplo.com/contas/v1/contas-processamento/1">http://api.exemplo.com/contas/v1/contas-processamento/1</a></p>
+<ol start="2">
+<li>Na segunda requisição, o cliente deverá consultar a URL informada no Location para acompanhar o andamento da requisição.</li>
+</ol>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>GET <a href="http://api.exemplo.com/contas/v1/contas-processamento/1">http://api.exemplo.com/contas/v1/contas-processamento/1</a></p>
+<p><em>Response</em></p>
+<p>HTTP/1.1 200 Ok</p>
+<pre><code>{
+   &quot;data&quot;:{
+      &quot;id&quot;:&quot;1&quot;,
+      &quot;situacao&quot;: &quot;processando&quot;,
+      &quot;TTC&quot;: &quot;2019-07-16T19:20:30.00-03:00&quot;,
+      &quot;mensagens&quot;: [
+         {
+		   &quot;codigo&quot;: &quot;103&quot;,
+		   &quot;mensagem&quot; : &quot;Sua requisicao está esperando pela verificação de um operador.&quot;,
+		   &quot;tipo&quot;: &quot;info&quot;
+         }
+      ]
+   }
+}
+</code></pre>
+<p>      Sendo:</p>
+<ul>
+<li><strong>id</strong>: o identificador do processamento;</li>
+<li><strong>situacao</strong>: [processando, sucesso, falha] indica qual é a situação do processamento;</li>
+<li><strong>TTC</strong>: <strong>T</strong>ime <strong>t</strong>o <strong>c</strong>ompletion indica quando é estimado que o processamento termine. Nesta hora, é o momento de fazer uma nova requisição para checar a situação do processamento.</li>
+<li><strong>mensagens</strong>: um array de mensagens com detalhes sobre o processamento;</li>
+<li><strong>mensagens.codigo</strong>: identificador sistêmico da mensagem;</li>
+<li><strong>mensagens.mensagem</strong>: mensagem para descrevendo detalhes do processamento;</li>
+<li><strong>mensagens.tipo</strong>: [info, aviso, erro] o tipo de informação na mensagem.</li>
+</ul>
+<ol start="3">
+<li>Em algum momento, o processamento estará completo, seja com erro ou não. Em caso de sucesso, a resposta será um HTTP Status Code 303 See Other que indicará que o recurso foi criado e está na URL indicada no Location.</li>
+</ol>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>GET <a href="http://api.exemplo.com/contas/v1/contas-processamento/1">http://api.exemplo.com/contas/v1/contas-processamento/1</a></p>
+<p><em>Response</em></p>
+<p>HTTP 303 See Other</p>
+<p>Location: <a href="http://api.exemplo.com/contas/v1/contas/21531234567">http://api.exemplo.com/contas/v1/contas/21531234567</a></p>
+<p>Content-Location: <a href="http://api.exemplo.com/contas/v1/contas-processamento/1">http://api.exemplo.com/contas/v1/contas-processamento/1</a></p>
+<pre><code>{
+	&quot;data&quot;:{
+	  &quot;id&quot;:&quot;1&quot;,
+	  &quot;situacao&quot;: &quot;sucesso&quot;,
+	  &quot;TTC&quot;: null,
+      &quot;mensagens&quot;: [
+		 {
+		   &quot;codigo&quot;: &quot;001&quot;,
+		   &quot;mensagem&quot; : &quot;A conta foi criada com sucesso.&quot;,
+		   &quot;tipo&quot;: &quot;info&quot;
+		  }
+		]
+	}
+}
+</code></pre>
+<ol start="4">
+<li>Agora já é possível fazer a requisição no endereço do Location <a href="http://api.exemplo.com/contas/v1/contas/21531234567">http://api.exemplo.com/contas/v1/contas/21531234567</a> e consultar o recurso criado.</li>
+</ol>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>GET <a href="http://api.exemplo.com/contas/v1/contas/21531234567">http://api.exemplo.com/contas/v1/contas/21531234567</a></p>
+<p><em>Response</em></p>
+<p>HTTP/1.1 200 Ok</p>
+<pre><code>{
+   &quot;data&quot;:{
+      &quot;id&quot;: 21531234567,
+      &quot;agencia&quot;: 2153,
+      &quot;conta&quot;: 123456,
+      &quot;dac&quot;: 7,
+      &quot;segmento&quot;: &quot;premium&quot;,
+      &quot;cliente&quot;: &quot;José da Silva&quot;,
+      &quot;...&quot;: &quot;...&quot;
+   }
+}
+</code></pre>
+<p>Caso a situação no retorno no passo 2 seja falha,  deve-se retornar o motivo e o processamento é encerrado.</p>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>GET <a href="http://api.exemplo.com/contas/v1/contas-processamento/1">http://api.exemplo.com/contas/v1/contas-processamento/1</a></p>
+<p><em>Response</em></p>
+<p>HTTP/1.1 200 Ok</p>
+<p>Content-Location: <a href="http://api.exemplo.com/contas/v1/contas-processamento/1">http://api.exemplo.com/contas/v1/contas-processamento/1</a></p>
+<pre><code>{
+   &quot;data&quot;:{
+      &quot;id&quot;:&quot;1&quot;,
+      &quot;situacao&quot;: &quot;falha&quot;,
+      &quot;TTC&quot;: null,
+      &quot;mensagens&quot;: [
+         {
+            &quot;codigo&quot;: &quot;ERR135&quot;,
+            &quot;mensagem&quot; : &quot;A conta não foi criada por conta de restrição de crédito.&quot;,
+            &quot;tipo&quot;: &quot;erro&quot;
+         }
+      ]
+   }
+}
+</code></pre>
+<p>Ao término do processamento:</p>
+<ul>
+<li>o cliente poderia fazer um DELETE na URL de processamento;</li>
+<li>e/ou o servidor pode remover automaticamente os dados de processamento após um determinado tempo e retornar um HTTP Status Code 410 Gone para quem chamar novamente a URL do processamento;</li>
+<li>ou o servidor pode não implementar DELETE e manter para sempre as informações sobre o processamento.</li>
+</ul>
+<h4 id="callbacks"><a id="callbacks"></a>Callbacks</h4>
+<p>Além da possibilidade do cliente fazer consultas recorrentes no passo 2 (<strong>pooling</strong>) para verificar o andamento do processamento, pode-se optar por fazer callback do servidor para o cliente quando a requisição estiver terminada (<strong>webhook</strong>). Neste caso, o cliente deverá fazer uma requisição ao recurso informando o header <strong>[Empresa]-Callback</strong>.</p>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>POST  <a href="http://api.exemplo.com/contas/v1/contas">http://api.exemplo.com/contas/v1/contas</a></p>
+<p>EmpresaExemplo-Callback: <a href="http://api.clienteexemplo.com/contas-callback">http://api.clienteexemplo.com/contas-callback</a></p>
+<p><em>Response</em></p>
+<p>HTTP/1.1 200 OK</p>
+<p>Location:  <a href="http://api.exemplo.com/contas/v1/contas-processamento/1">http://api.exemplo.com/contas/v1/contas-processamento/1</a></p>
+<pre><code>{
+   &quot;data&quot;:{
+      &quot;id&quot;:&quot;1&quot;,
+	  &quot;situacao&quot;: &quot;processando&quot;,
+	  &quot;TTC&quot;: &quot;2019-07-16T19:20:30.00-03:00&quot;,
+      &quot;mensagens&quot;: [
+		 {
+		   &quot;codigo&quot;: &quot;103&quot;,
+		   &quot;mensagem&quot; : &quot;Sua requisicao está esperando pela verificação de um operador.&quot;,
+		   &quot;tipo&quot;: &quot;info&quot;
+		  }
+		]
+	}
+}
+</code></pre>
+<p>O cliente pode optar por não chamar mais a API de processamento para verificar o andamento, pois o servidor enviará a resposta via POST para a URL informada pelo cliente (<a href="http://api.clienteexemplo.com/contas-callback">http://api.clienteexemplo.com/contas-callback</a>) ao término do processamento. No Body enviado para o cliente, deverá conter todas informações referentes ao processamento.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h2 id="processamento-em-lotes"><a id="processamento-em-lotes"></a>Processamento em lotes</h2>
+<p>Hoje existem ferramentas que permitem alta performance para atender grandes volumes de requisições online, sem a necessidade de precisar acumular requisições para processar de uma só vez. Quando se fala em REST API, normalmente busca-se este cenário de processamento em tempo real. No entanto, principalmente em REST APIs de uso interno, existem situações onde o processamento é feito em lotes. Neste cenário, pode-se seguir o seguinte padrão:</p>
+<ol>
+<li>O cliente define um array de objetos, sendo cada deles um request HTTP declarado com todos os seus componentes (incluindo URL, verbos e headers);</li>
+<li>O cliente submete o array mensagem para o servidor usando o verbo POST para um recurso de API preparado para receber a requisição do passo 1;</li>
+</ol>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>POST .../batch</p>
+<p>Content-Type: application/json</p>
+<pre><code>{
+&quot;requests&quot;:[
+      {
+         &quot;method&quot;: &quot;PUT&quot;,
+         &quot;url&quot;: &quot;http://api.exemplo.com/recurso/123&quot;,
+         &quot;headers&quot;: [
+            {&quot;name&quot;: &quot;Content-Type&quot;, &quot;value&quot;: &quot;application/json&quot;}
+         ],
+         &quot;body&quot;: {
+            &quot;...&quot;: &quot;...&quot;
+         }
+      },
+      {
+         &quot;method&quot;: &quot;POST&quot;,
+         &quot;url&quot;: &quot;http://api.exemplo.com/recurso&quot;,
+         &quot;headers&quot;: [
+            {&quot;name&quot;: &quot;Content-Type&quot;, &quot;value&quot;: &quot;application/json&quot;}
+         ],
+         &quot;body&quot;: {
+            &quot;...&quot;: &quot;...&quot;
+         }
+      }
+   ]
+}
+</code></pre>
+<ol start="3">
+<li>O servidor quando receber a requisição, deve processar o array separando cada item do array e despachando-os para as respectivas APIs que fazem o processamento individual de cada item.
+<ul>
+<li>Alternativamente, o servidor pode ignorar o envio para cada API e processar diretamente a lista de requests;</li>
+</ul>
+</li>
+<li>O servidor coleta a resposta de cada request e devolve para o cliente através de um array respeitando a sequência da requisição.</li>
+</ol>
+<p><em>Response</em></p>
+<p>HTTP/1.1 200 OK</p>
+<p>Content-Type: application/json</p>
+<pre><code>{
+&quot;responses&quot;:[
+      {
+         &quot;httpStatus&quot;: &quot;200&quot;,
+         &quot;message&quot;: &quot;OK&quot;,
+         &quot;headers&quot;: [
+            {&quot;name&quot;: &quot;Content-Type&quot;, &quot;value&quot;: &quot;application/json&quot;},
+            {&quot;name&quot;: &quot;Content-Location&quot;, &quot;value&quot;: &quot;http://api.exemplo.com/recurso/123&quot;}
+         ],
+         &quot;body&quot;: {
+            &quot;...&quot;: &quot;...&quot;
+         }
+      },
+      {
+         &quot;httpStatus&quot;: &quot;412&quot;,
+         &quot;message&quot;: &quot;Precondition Failed&quot;,
+         &quot;headers&quot;: [
+            {&quot;name&quot;: &quot;Content-Type&quot;, &quot;value&quot;: &quot;application/json&quot;},
+            {&quot;name&quot;: &quot;Content-Location&quot;, &quot;value&quot;: &quot;http://api.exemplo.com/recurso&quot;}
+         ],
+         &quot;body&quot;: {
+            &quot;...&quot;: &quot;...&quot;
+         }
+      }
+   ]
+}
+</code></pre>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h2 id="recursividade"><a id="recursividade"></a>Recursividade</h2>
+<p>Existem casos em que os recursos da API podem se aninhar recursivamente.
+Por exemplo, uma cadeia societária:</p>
+<ul>
+<li><strong>JOSÉ</strong> é sócio de:
+<ul>
+<li>Maria que é sócia de:
+<ul>
+<li>Empresas Azul que tem como sócios:
+<ul>
+<li>Carlos</li>
+<li>João</li>
+<li>Empresas Amarelas que tem como sócios:
+<ul>
+<li>Empresas Verdes que tem como sócios:</li>
+<li><strong>JOSÉ</strong></li>
+<li>Lisa</li>
+<li>Renata</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Analisando este cenário simples, já podemos concluir que se criarmos uma estrutura com os sócios &quot;aninhados&quot; entre eles, não temos como saber de forma genérica qual é a profundidade das ramificações possíveis, logo, fica difícil definir em um contrato de REST APIs esses objetos aninhados.</p>
+<p>Por exemplo, estruturando os sócios em URLs como recursos, teríamos o cenário:
+.../empresas/abc123Xyz/<strong>socios</strong>/JOSÉ/<strong>socios</strong>/Maria/<strong>socios</strong>/EmpresasAzul/<strong>socios</strong>/...</p>
+<p>Esta abordagem traz as seguintes dificuldades:</p>
+<ul>
+<li>todos os sócios da rota é a entidade sócio, então ao tentar acessar os Path Parameters, teremos vários com o mesmo identificador &quot;idSocio&quot;, ficando menos óbvia a recuperação destas informações no servidor.</li>
+<li>não é possível definir previamente a quantidade de aninhamentos (recursos do tipo sócio)</li>
+<li>um mesmo recurso (o sócio id JOSÉ) poderia estar representado em duas rotas diferentes, ora como sócio da empresa &quot;abc123Xyz&quot;, ora como sócio do sócio &quot;Empresas Verdes&quot;. O ideal no REST é que o recurso seja acessado apenas em uma rota.</li>
+</ul>
+<p>Caso a opção fosse definir estes sócios não como recursos, mas como estruturas aninhadas dentro de um único recurso &quot;sócio&quot;, teríamos algo assim:</p>
+<p><em>Request</em></p>
+<p>GET .../empresas/abc123Xyz/<strong>socios</strong>/JOSE</p>
+<p><em>Response</em></p>
+<p>HTTP/1.1 200 OK</p>
+<pre><code>{
+   &quot;data&quot;:[
+      { 
+         &quot;id&quot;: &quot;JOSE&quot;, 
+         &quot;outrosDados&quot;: &quot;...&quot;,
+         &quot;socios&quot;: [
+            {
+               &quot;id&quot;: &quot;MARIA&quot;, 
+               &quot;outrosDados&quot;: &quot;...&quot;,
+	           &quot;socios&quot;: [
+                  {
+                     &quot;id&quot;: &quot;EMPRESASAZUL&quot;, 
+                     &quot;outrosDados&quot;: &quot;...&quot;,
+                     &quot;socios&quot;: [
+                        {
+                           &quot;id&quot;: &quot;CARLOS&quot;, 
+                           &quot;outrosDados&quot;: &quot;...&quot;,
+                           &quot;socios&quot;: [
+                              {
+                                 &quot;outrosSocios&quot;: &quot;...&quot;
+                              }
+                           ]
+                        },
+                        {
+                           &quot;id&quot;: &quot;JOAO&quot;, 
+                           &quot;socios&quot;: [
+                              {
+                                 &quot;outrosSocios&quot;: &quot;...&quot;
+                              }
+                           ]
+                        }
+                     ]
+                  }
+               ]
+            }
+         ]
+      }
+   ]
+} 
+</code></pre>
+<p>Esta abordagem traz as seguintes dificuldades:</p>
+<ul>
+<li>Caso seja necessário trocar o telefone do sócio Maria, por exemplo, não haveria uma URL para fazer um PATCH diretamente no recurso. Seria necessário enviar o .../socios/JOSE completo com todos os seus aninhamentos para alterar uma informação pequena.</li>
+<li>Não temos como saber previamente a quantidade de sócios para aninhar e definir no contrato do recurso (JSON) que representa essa entidade de socios.</li>
+</ul>
+<h3 id="solucao"><a id="solu&#231;&#227;o"></a>Solução</h3>
+<p>Para contornar os problemas explicados acima, podemos separar o recurso sócio do relacionamento entre eles. Ex:</p>
+<p>Recurso <strong>sócio</strong>:</p>
+<p><em>Request</em></p>
+<p>GET .../empresas/abc123Xyz/<strong>socios</strong>/JOSE</p>
+<p><em>Response</em></p>
+<pre><code>{
+   &quot;data&quot;: {
+      &quot;id&quot;: &quot;JOSE&quot;,
+      &quot;nome&quot;: &quot;José&quot;,
+      &quot;cpf&quot;: &quot;11122233344&quot;,
+      &quot;...&quot;: &quot;...&quot;
+   }
+}
+</code></pre>
+<p>Recurso <strong>associacoes</strong> (unitário):</p>
+<p><em>Request</em></p>
+<p>GET .../empresas/abc123Xyz/<strong>associacoes</strong>/123</p>
+<p><em>Response</em></p>
+<pre><code>{
+   &quot;data&quot;: {
+      &quot;id&quot;: 123,
+      &quot;idSocio&quot;: &quot;MARIA&quot;,
+      &quot;associacaoPai&quot;: &quot;JOSE&quot;
+	}
+}
+</code></pre>
+<p>Recurso <strong>associacoes</strong> (array):</p>
+<p><em>Request</em></p>
+<p>GET .../empresas/abc123Xyz/<strong>associacoes</strong></p>
+<p><em>Response</em></p>
+<pre><code>{
+   &quot;data&quot;: [
+      {
+         &quot;id&quot;: 123,
+         &quot;idSocio&quot;: &quot;MARIA&quot;,
+         &quot;associacaoPai&quot;: &quot;JOSE&quot;
+      },
+      {
+         &quot;id&quot;: 124,
+         &quot;idSocio&quot;: &quot;EMPRESAAZUL&quot;,
+         &quot;associacaoPai&quot;: &quot;MARIA&quot;
+      },
+   ]
+}
+</code></pre>
+<p>Dessa forma, deixando a associação do recurso &quot;sócios&quot; em uma rota separada, a implementação fica em um nível de granularidade que também reduz problemas de concorrência, pois cada associação pode ser adicionada ou removida independentemente das outras associações do mesmo sócio.
+As buscas nestas rotas seguem as mesmas práticas já explicadas neste guia. Ex:</p>
+<ul>
+<li>GET .../empresas/abc123Xyz/socios
+<em>(traria um array com todos os sócios da empresa abc123Xyz)</em></li>
+<li>GET .../empresas/abc123Xyz/associacoes/123
+<em>(traria uma associação específica em que já conhecemos o ID)</em></li>
+<li>GET .../empresas/abc123Xyz/associacoes?id_socio=CARLOS
+<em>(traria as associações do sócio CARLOS)</em></li>
+<li>GET .../empresas/abc123Xyz/associacoes?associacaoPai=MARIA
+<em>(traria as associações de sócios cujo &quot;sócio pai&quot; seja o sócio MARIA)</em></li>
+<li>DELETE .../empresas/abc123Xyz/associacoes/123
+<em>(apagaria a associação com o id 123)</em></li>
+<li>DELETE .../empresas/abc123Xyz/associacoes?associacaoPai=MARIA
+<em>(apagaria a associação cujo pai é o sócio MARIA)</em></li>
+</ul>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h2 id="versionamento"><a id="versionamento"></a>Versionamento</h2>
+<p>Versionamento acontece quanto ocorrem alterações no contrato da API. Contrato é a definição de todo o conjunto de verbos, códigos de resposta, recursos etc. feita em uma notação padrão para isso como o RAML, Open API Specification etc. O ideal é que estes documentos sejam armazenados em um repositório de código fonte e a cada alteração, versionados. Assim, existirão dois tipos de versão: aquela do contrato no repositório e aquela que repassamos para o cliente (consumidor da API).</p>
+<p>Para realizar o versionamento dos contratos das APIs podemos fazer uso do <a href="https://semver.org/">Semantic Versioning 2.0.0</a>. Esta definição utiliza a seguinte estrutura <strong>MAJOR.MINOR.PATCH</strong>. Onde se incrementa os valores conforme a seguinte regra:</p>
+<ul>
+<li><strong>MAJOR</strong>: implica mudanças incompatíveis para a API. Ou seja, que faz com que os consumidores atuais não consigam mais utilizar a API sem ter de alterar seus softwares.
+Ex (era <strong>1</strong>.0.0 e vira <strong>2</strong>.0.0):
+<ul>
+<li>remoção de qualquer item que faz parte do HTTP e do REST (Status Code, Verbo, Recursos, Parâmetros, Atributos etc);</li>
+<li>tornar campos já existentes - antes não obrigatórios - como obrigatórios;</li>
+<li>alteração de tipos de dados.</li>
+</ul>
+</li>
+<li><strong>MINOR</strong>: implica adicionar funcionalidades que mantém compatibilidade com a versão atual. Ou seja, os consumidores atuais não terão que alterar seu software para continuar usando a API.
+Ex (era 2.<strong>0</strong>.0 e vira 2.<strong>1</strong>.0):
+<ul>
+<li>adição de novos recursos;</li>
+<li>em recursos já existentes, adição de novos atributos ou parâmetros não obrigatórios na requisição;</li>
+<li>adição de novos atributos no response;</li>
+<li>adição de novos verbos;</li>
+<li>adição de novos Status Codes;</li>
+</ul>
+</li>
+<li><strong>PATCH</strong>: implica em mudanças que não alteram a API.
+Ex (era 2.0.<strong>0</strong> e vira 2.1.<strong>1</strong>):
+<ul>
+<li>alteração nas descrições dos campos;</li>
+<li>alterações nos exemplos;</li>
+<li>alterações em arquivos extras ao contrato que contém metadados usados por governança ou deploy.</li>
+</ul>
+</li>
+</ul>
+<p>A versão incial do contrato da API é a 1.0.0. O valor definido no MAJOR, no caso <strong>1</strong> é o valor que mostramos para o cliente, dado que é a alteração no MAJOR que obriga-o a alterar o seu software.</p>
+<p>Existem algumas formas diferentes de se versionar a API para o cliente. Nenhuma é totalmente certa, nem errada e a especificação do REST não define este item. O que existe são tendências maiores ou menores de adoção de alguns padrões por conta dos prós e contras que cada um oferece.</p>
+<p>Do ponto de vista do cliente, também é interessante tomar alguns cuidados: para minimizar os impactos de qualquer alteração, mesmo aquelas que não quebram o contrato, os clientes destas APIs devem evitar consumir mais campos do que o necessário ao chamar uma API. Eles devem usar apenas aqueles campos que o cliente realmente precisa e deve ignorar os que não precisa. Este conceito é abordado em <a href="https://martinfowler.com/bliki/TolerantReader.html">Tolerant Reader (Martin Fowler)</a>.</p>
+<h4 id="versionamento-pelo-host"><a id="versionamento-pelo-host"></a>Versionamento pelo host</h4>
+<p>Na estrutura de host da URL, coloca-se a versão como parte dele. Por exemplo:
+<a href="https://api-v2.empresaexemplo.com/clientes">https://api-v2.empresaexemplo.com/clientes</a></p>
+<p>Observe o &quot;-v2&quot;, que específica que esta é a versão 2 da API.</p>
+<p>O ponto negativo desta abordagem é que do ponto de vista de deploy, é mais difícil criar um novo nome no host do que outras abordagens em que se cria pastas (recursos), por exemplo.</p>
+<h4 id="versionamento-pela-query-string"><a id="versionamento-pela-query-string"></a>Versionamento pela query string</h4>
+<p>Define-se a versão a versão via  <strong>query string</strong>, por exemplo:</p>
+<p><a href="https://api.empresaexemplo.com/clientes?version=2.0">https://api.empresaexemplo.com/clientes?version=2.0</a></p>
+<p>Observe o version=2.0, que especifica que essa é a versão 2.0 dessa API.</p>
+<p>O ponto negativo dessa abordagem é que prejudica a definição de contrato para outras versões e prejudica a legibilidade da URL em cenários de muitos parâmetros. Além de facilitar com que o cliente esqueça de definir a versão ao chamar a API e talvez tome erro por estar chamando a versão default.</p>
+<h4 id="versionamento-pelo-content-type-com-o-header-accept"><a id="versionamento-pelo-content-type-(com-o-header-accept)"></a>Versionamento pelo Content-Type (com o header Accept)</h4>
+<p>Define-se um tipo customizado de conteúdo com a versão dele. Por exemplo:</p>
+<p>GET <a href="https://api.empresaexemplo.com/clientes">https://api.empresaexemplo.com/clientes</a></p>
+<p>Accept: application/vnd.clientes.v2+json</p>
+<p>O ponto positivo é que a URL fica mais clean, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.</p>
+<h4 id="versionamento-por-header-customizado"><a id="versionamento-por-header-customizado"></a>Versionamento por header customizado</h4>
+<p>Define-se um header customizado para requisitar a versão da API. Por exemplo:</p>
+<p>GET <a href="https://api.empresaexemplo.com/clientes">https://api.empresaexemplo.com/clientes</a></p>
+<p>api-version: 2</p>
+<p>O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.</p>
+<h4 id="versionamento-pelo-path-resources"><a id="versionamento-pelo-path-(resources)"></a>Versionamento pelo Path (Resources)</h4>
+<p>Define-se a versão no Path como se fosse um recurso, por exemplo:</p>
+<p><a href="https://api.empresaexemplo.com/v1/clientes">https://api.empresaexemplo.com/v1/clientes</a></p>
+<p>Esta é a minha forma preferencial de versionar pois, fazendo parte da URL você força sempre o cliente a informá-la; a versão está sempre visível; em processo de deploy, é muito mais simples criar uma pasta do que definir um novo host; mantém um visual clean na URL e facilita na definição de contratos para versões novas.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h2 id="transferencia-de-arquivos"><a id="transfer&#234;ncia-de-arquivos"></a>Transferência de arquivos</h2>
+<p>REST significa <strong>Representational State Transfer</strong>, ou seja transferência de representações do estado em que as entidades de negócio se encontram em determinado momento.</p>
+<ul>
+<li><p><strong>Estado</strong> são os valores que, quando juntos, diferenciam uma entidade da outra.</p>
+</li>
+<li><p><strong>Transferência</strong> refere-se à capacidade de alterar estes valores.</p>
+</li>
+<li><p><strong>Representação</strong> refere-se à capacidade de representar o estado, que provavelmente está na forma de registros em um banco de dados, através de alguma notação padronizada como JSON, XML etc.</p>
+</li>
+</ul>
+<p>No que tange representação, podemos dizer que uma URL que represente o &quot;contrato de prestação de um serviço&quot;, por exemplo, pode existir na forma de:</p>
+<ul>
+<li>formulário de papel preenchido à caneta;</li>
+<li>imagem resultante de uma microfilmagem do formulário;</li>
+<li>informações armazenadas em um banco de dados;</li>
+<li>informações em JSON utilizadas para intercâmbio entre sistemas;</li>
+<li>arquivo PDF etc.</li>
+</ul>
+<p>REST APIs são amplamente utilizadas para representação dos recursos via JSON. Para transferência de arquivos, existem protocolos e tecnologias voltadas especialmente para isso, no entanto, dada a popularidade, muitos implementam também em REST para este fim.</p>
+<p>Abaixo, vamos explorar alguns cenários diferentes para entregar a capacidade de transferência de arquivos via REST.</p>
+<h2 id="url-recurso-dedicado-para-exposicao-de-arquivos"><a id="url-(recurso)-dedicado-para-exposi&#231;&#227;o-de-arquivos"></a>URL (recurso) dedicado para exposição de arquivos</h2>
+<p>Em algumas arquiteturas, teremos URLs dedicadas a expor arquivos de todos os tipos, independente do tipo de recurso que ele representa.</p>
+<p>Podemos dizer que o negócio que essas URLs expõem é a capacidade de gestão de arquivos.</p>
+<p>Para se construir APIs de sistema de gestão de arquivos, é como construir uma API para algum tipo de negócio: entender como funciona o sistema onde estão os arquivos, suas entidades, atributos e expor seguindo os padrões REST. Assim, fará parte das entidades informações como md5, permissões, data de criação, última alteração, informações de sequência e segmentação de arquivos, links temporários etc. Por trás do processamento da API provavelmente teremos também recursos de compactação, antivírus, gestão de storage etc.</p>
+<p>Sistemas de negócio da empresa usam este sistema de gestão de arquivos (através das duas APIs) e normalmente seguem o fluxo:</p>
+<ul>
+<li>o sistema de negócio registra metadados do arquivo mais o arquivo no sistema de gestão de arquivos;</li>
+<li>o sistema de gestão de arquivos armazena o arquivo em um repositório centralizado e devolve um ID do arquivo;</li>
+<li>o sistema de negócio armazena o ID em seu repositório;</li>
+<li>o sistema de negócio envia a URL com o identificador do arquivo para o cliente da API (via HATEOAS, por exemplo);</li>
+<li>o cliente do sistema de negócio acessa o arquivo na URL disponibilizada pelo sistemas de gestão de arquivos.</li>
+</ul>
+<p>Exemplos públicos deste tipo de API de gestão de arquivos:</p>
+<p><a href="https://docs.microsoft.com/en-us/rest/api/storageservices/file-service-rest-api">https://docs.microsoft.com/en-us/rest/api/storageservices/file-service-rest-api</a></p>
+<p><a href="https://docs.aws.amazon.com/pt_br/AmazonS3/latest/dev/RESTAPI.html">https://docs.aws.amazon.com/pt_br/AmazonS3/latest/dev/RESTAPI.html</a></p>
+<p><a href="https://developers.google.com/drive/api/v2/manage-uploads">https://developers.google.com/drive/api/v2/manage-uploads</a></p>
+<p><a href="https://developers.convertio.co/pt/api/docs/">https://developers.convertio.co/pt/api/docs/</a></p>
+<p>Para a etapa de envio de arquivo, já vi 3 tipos de abordagens:</p>
+<p>1 - Enviar os bytes do arquivo como <strong>Base64 mais seus metadados usando JSON</strong>.</p>
+<p>Esta é a abordagem menos recomendada e parece ser uma forma simples, pois nada muda em relação à tudo que já passamos neste guia: o arquivo é trafegado em forma de texto dentro de um atributo em um JSON. O Base64 é um método para codificação de dados utilizado para transmitir dados binários por meios de transmissão que lidam apenas com texto. É amplamente utilizado na web. No entanto, o formato Base64 é cerca de 33% maior que o dado original binário. Este payload maior pode impactar toda a pilha de tecnologias associadas à API: equipamento do cliente, gateway, log, armazenamento, tráfego de rede, processamento, memória, compactação HTTP etc. Além da necessidade de conversão do binário em string e vice versa. Assim, é interessante avaliar o quão grande será o volume de dados antes de adotá-la.</p>
+<p>2 - Enviar os <strong>bytes do arquivo diretamente em uma URL</strong> e os <strong>metadados em outra URL</strong> usando JSON.</p>
+<p>Esta abordagem permite não usar o Base64 e trafegar o arquivo direto como um binário. No entanto, requer que se pense em controles para garantir que um arquivo está presente tanto com seus metadados, como o binário em si, já que são duas URLs diferentes e o cliente pode acabar apenas enviando o arquivo e não enviando o binário.</p>
+<p>3 - Usar uma requisição HTTP do tipo <strong>multipart/form-data com os bytes do arquivo mais metadados</strong> em uma só requisição.</p>
+<p>Esta abordagem é a tecnicamente mais interessante, pois resolve os dois problemas que as técnicas anteriores apresentam.</p>
+<p>O uso varia conforme a linguagem de programação e em HTTP, mas em linhas gerais o funcionamento segue abaixo:</p>
+<p>Abaixo temos um comando curl (que é um software cliente HTTP via linha de comando)</p>
+<pre><code>curl --location --request POST 'http://api.empresa.com/gestao-arquivos/v1/arquivos' \
+--form 'descricao=Exemplo de Arquivo' \
+--form 'autor=Fulano de Tal' \
+--form 'arquivo=@/C:/imagem.png'
+</code></pre>
+<p>O curl ou a linguagem de programação que você tiver utilizando converterá em uma requisição HTTP multipart/form-data. Observe que neste formato, uma mesma requisição transporta tipos de conteúdos diferentes, desde o binário do arquivo aos metadados. Observe também como a boundary atua: é um texto usado para definir a fronteira entre os conteúdos, quando um acaba e o outro começa.</p>
+<pre><code>POST http://api.empresa.com/gestao-arquivos/v1/arquivos HTTP/1.1
+Content-Type: multipart/form-data; boundary=---------------------------7d81b517112482 
+Accept-Encoding: gzip, deflate
+Content-Length: 324
+
+-----------------------------7d81b517112482 
+Content-Disposition: form-data; name=&quot;arquivo&quot;; filename=&quot;C:/imagem.png&quot;
+Content-Type: image/png
+
+[conteudo_do_arquivo_em_formato_binario]
+-----------------------------7d81b517112482
+Content-Disposition: form-data; name=&quot;descricao&quot;
+Content-Type: text/plain
+
+Exemplo de Arquivo
+-----------------------------7d81b517112482
+Content-Disposition: form-data; name=&quot;autor&quot;
+Content-Type: text/plain
+
+Fulano de Tal
+-----------------------------7d81b517112482--
+</code></pre>
+<p>O resultado no HTTP é sempre o mesmo, no entanto, cada linguagem tem suas próprias características para receber e transformar os conteúdos nesta mensagem HTTP.</p>
+<p>Se quiser ver um exemplo em .NET Core para receber e manipular uma requisição com multipart/form-data, consulte este <a href="https://gist.github.com/oliveira-michel/d677ed4ba726bee05b509824f40b6c11">gist</a>.</p>
+<p>Também existe a possibilidade de se utilizar multipart/byteranges em conjunto com HTTP 206 e o header Content-Range, indicando que está sendo trabalhado apenas um subconjunto de um documento inteiro. Se você esbarrou na necessidade de trabalhar com este cenário, entre em contato que exploro mais esta parte do guia.</p>
+<p>Já para a etapa de baixar um o arquivo já no servidor, não há nenhum segredo: basta expor em uma URL para o cliente fazer o GET nele. Por exemplo:</p>
+<p>GET <a href="http://api.empresa.com/gestao-arquivos/v1/arquivos/ac627c5032694a81bba844369bc1b410.png">http://api.empresa.com/gestao-arquivos/v1/arquivos/ac627c5032694a81bba844369bc1b410.png</a></p>
+<p>Neste caso, além do tipo de arquivo definido pela extensão, deve-se preencher o header Content-Type com o mime type, no caso: image/png.</p>
+<h2 id="disponibilizacao-de-arquivos-gerados-em-tempo-real"><a id="disponibiliza&#231;&#227;o-de-arquivos-gerados-em-tempo-real"></a>Disponibilização de arquivos gerados em tempo real</h2>
+<p>Ao contrário do modelo anterior, existem situações em que o arquivo é gerado em tempo real por um processo de negócio e não precisa ser armazenado em um repositório centralizado como no modelo explicado acima.</p>
+<p>Ele apenas precisa entregar uma representação diferente do estado do recurso, por exemplo, em PDF.</p>
+<blockquote>
+<p>É preciso tomar cuidado com este tipo de abordagem, pois aumenta o tempo de uso e processamentos de serviços, gateways etc. que nem sempre são configurados para requisições síncronas com tempo de processamento mais altos.</p>
+</blockquote>
+<p>Vamos ao REST! Com relação à URL, mantém-se o conceito de que é importante buscar ter uma única URL para representar um determinado recurso, logo, como diferenciar <strong>qual é a representação que o cliente espera receber de um recurso?</strong></p>
+<p>Normalmente em sistemas Microsoft, poderíamos informar a extensão do arquivo, no entanto, nem todos os sistemas utilizam extensão. Também poderíamos informar os <a href="https://en.wikipedia.org/wiki/Magic_number_%28programming%29#Magic_numbers_in_files">número mágicos</a> que estão presentes em alguns tipos de arquivos. Por exemplo, um PNG começa com o hexadecimal 89 50 4E 47, mas nem todos os arquivos têm este padrão.</p>
+<p>Assim, na web a definição de tipo mais comum é feita via MIME Type. MIME Type é um texto padronizado que indica o tipo de documento requerido quando ele não é um dos padrões interpretados automaticamente na web. Veja mais sobre MIME Type no site da <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Basico_sobre_HTTP/MIME_types">Mozilla</a> e os tipos mais comuns <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types">aqui</a>.</p>
+<p>Para se definir qual é o MIME Type esperado como resposta, utiliza-se o header <strong>Accept</strong>.</p>
+<p>Para ler qual é o MIME Type recebido como resposta, utiliza-se o header <strong>Content-Type</strong>.</p>
+<p>O header <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Headers/Accept">Accept</a> permite múltiplos tipos com pesos devido à sintaxe <a href="https://developer.mozilla.org/en-US/docs/Glossary/quality_values">quality value</a>. Ex:</p>
+<p>Se o cliente prefere receber um PDF e, se não for possível, um .doc ou .docx, o header pode ser especificado assim:</p>
+<p>Accept: application/pdf;q=0.9, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document;q=0.8</p>
+<p>O servidor, ao receber o header Accept, deve verificar se é capaz de retornar o MIME Type solicitado e se for, retorna o binário do arquivo.</p>
+<p>Ex:</p>
+<p><em>Request</em></p>
+<p>GET <a href="http://api.banco.com/contas/00123456/extrato?fromData=2019-01-01&amp;">http://api.banco.com/contas/00123456/extrato?fromData=2019-01-01&amp;</a></p>
+<p>Accept: application/json</p>
+<p><em>Response</em></p>
+<p>Content-Type: application/json</p>
+<pre><code>{ 
+  &quot;saldo&quot;: 102.36,
+  &quot;lancamentos&quot;: [
+    {&quot;data&quot;: &quot;2019-01-01T10:26Z&quot;, &quot;descricao&quot;: &quot;Pagamento Boleto&quot;, &quot;valor&quot;: -23.78},
+    {&quot;data&quot;: &quot;2019-01-02T12:00Z&quot;, &quot;descricao&quot;: &quot;Salário&quot;, &quot;valor&quot;: 5275.36}
+  ]
+}
+</code></pre>
+<p><em>Request</em></p>
+<p>GET <a href="http://api.banco.com/contas/00123456/extrato?fromData=2019-01-01&amp;">http://api.banco.com/contas/00123456/extrato?fromData=2019-01-01&amp;</a></p>
+<p>Accept: application/pdf</p>
+<p><em>Response</em></p>
+<p>Content-Type: application/pdf</p>
+<pre><code>[binary-content]
+</code></pre>
+<p>Se quiser ver um exemplo em .NET Core para responder mais de um tipo de MIME Type, consulte este <a href="https://gist.github.com/oliveira-michel/b3ff3face96202a7ba44d6825ffec1a2">gist</a>.</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h2 id="seguranca"><a id="seguran&#231;a"></a>Segurança</h2>
+<p>TO DO: Aguarde! Este capítulo será escrito em breve. :-)</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h2 id="performance-cache-e-compressao"><a id="performance-cache-e-compress&#227;o"></a>Performance, Cache e compressão</h2>
+<p>TO DO: Aguarde! Este capítulo será escrito em breve. :-)</p>
+<p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
+<h2 id="palavras-finais"><a id="palavras-finais"></a>Palavras finais</h2>
+<p>Quase tudo em REST abre discussões sobre estar mais aderente ou menos a um modelo que é &quot;vago&quot; em vários pontos. Por um lado dá liberdade para evolução de acordo com as necessidades do mercado, por outro, quando você olha o StackOverflow e concorda com as n respostas diferentes para a mesma pergunta, você conclui que o importante é adotar um padrão que faça sentido para sua empresa. Certo ou errado, seguir um padrão é muito melhor do que não seguir nenhum.</p>
+<p>A busca deve ser sempre em buscar o RESTful, no entanto, no meio do caminho vai ser normal entregar algumas APIs &quot;quase REST&quot; que adotam a maioria dos padrões mas abandona alguns em prol de timing de projeto, economia de recursos ou satisfação do cliente.</p>
+<p>Alguns destes padrões que abandonamos podem não fazer falta e não fará o desenvolvedor passar vergonha ao dizer que fez uma API REST, mas não implementou o HTTP Status Code A ou B; ou talvez não implementou HATEOAS em todas as APIs; ou não implementou paginação em alguma delas. No entanto, alguns anti-patterns são praticamente inadimissíveis, como usar somente o verbo POST para resolver todos os problemas; ignorar os comportamentos de idempotência e segurança; limitar a resposta a 200 para Ok e 500 para todo o resto sem nenhum detalhe adicional ... enfim, o recado é que busquem sempre entregar o melhor contrato possível.</p>
+<p>E com a prática, percebe-se que tudo isso aqui é muito simples, pois é técnico, é mais &quot;preto no branco&quot;. O real desafio estará em modelar o negócio, entender como ele é e representá-lo bem através de URLs e Atributos. Mas isto é assunto pra um outro guia.</p>
+</div>
+</body>
+</html>

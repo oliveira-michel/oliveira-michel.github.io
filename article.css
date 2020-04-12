@@ -1,0 +1,84 @@
+div.content {
+    background-color: white;
+    color: #232D37;
+}
+
+div.content h1:first-of-type {
+    background-position: 300px calc(100% - 200px);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: calc(100% - 300px);
+
+    margin-top: 0px;
+    margin-bottom: 0px;
+
+    position: relative;
+    display: block;
+    height: 200px;
+    color: white;
+    text-align: left;
+    padding-left: 30px;
+    font-size: 40px;
+    line-height: 100px;
+    text-shadow: 0 0 10px black, 0 0 8px black, 0 0 6px black, 0 0 4px black;
+}
+
+@media screen and (max-width: 1007px) {
+    div.content h1:first-of-type {
+        background-position: 0px calc(100% - 200px);
+        background-size: 100% ;
+
+        padding-left: 30px;
+    }
+}
+
+
+div.content pre {
+    font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
+    font-size: 12px;
+    border: 1px solid grey;
+    border-left: 3px solid grey;
+    border-radius: 3px;
+    padding: 10px;
+    overflow: auto;
+    
+    /* Fixed line height */
+    line-height: 14px;
+    
+    background-image: linear-gradient(180deg, rgb(243, 243, 243) 50%, #fff 50%);
+    
+    /* Size background so that the height is 2x line-height */
+    background-size: 100% 28px;
+    
+    /* Offset the background along the y-axis by top padding */
+    background-position: 0 10px;
+}
+
+div.content a {
+    color: #232D37;
+}
+
+div.content blockquote {
+    margin: 0 auto;
+    padding: 3px 20px;
+    border-left: 5px solid rgb(243, 243, 243);
+    font-style: italic;
+}
+
+div.content table {
+    border-collapse: collapse;
+}
+
+div.content table td, div.content table th {
+    border: 1px solid #ddd;
+    padding: 5px;
+}
+
+div.content table th {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    text-align: left;
+    font-weight: bold;
+}
+
+div.content table tr:nth-child(even){background-color: rgb(243, 243, 243)}
