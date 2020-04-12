@@ -19,7 +19,7 @@ div.content h1:first-of-type {
     text-align: left;
     padding-left: 30px;
     font-size: 40px;
-    line-height: 100px;
+    line-height: 80px;
     text-shadow: 0 0 10px black, 0 0 8px black, 0 0 6px black, 0 0 4px black;
 }
 
@@ -29,6 +29,7 @@ div.content h1:first-of-type {
         background-size: 100% ;
 
         padding-left: 30px;
+        line-height: 80px;
     }
 }
 
