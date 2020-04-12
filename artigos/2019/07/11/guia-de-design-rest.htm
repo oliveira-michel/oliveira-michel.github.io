@@ -1580,18 +1580,30 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
 <li>e/ou o servidor pode remover automaticamente os dados de processamento após um determinado tempo e retornar um HTTP Status Code 410 Gone para quem chamar novamente a URL do processamento;</li>
 <li>ou o servidor pode não implementar DELETE e manter para sempre as informações sobre o processamento.</li>
 </ul>
-<h4 id="callbacks"><a id="callbacks"></a>Callbacks</h4>
-<p>Além da possibilidade do cliente fazer consultas recorrentes no passo 2 (<strong>pooling</strong>) para verificar o andamento do processamento, pode-se optar por fazer callback do servidor para o cliente quando a requisição estiver terminada (<strong>webhook</strong>). Neste caso, o cliente deverá fazer uma requisição ao recurso informando o header <strong>[Empresa]-Callback</strong>.</p>
+<h4 id="callbacks-webhooks"><a id="callbacks-(webhooks)"></a>Callbacks (Webhooks)</h4>
+<p>Além da possibilidade do cliente fazer consultas recorrentes no passo 2 (<strong>pooling</strong>) para verificar o andamento do processamento, pode-se optar por fazer callback do servidor para o cliente quando a requisição estiver terminada (<strong>webhook</strong>). Neste caso, o cliente precisa ter um endereço HTTP (URL) publicado em um servidor para que a API que processa envie detalhes sobre a finalização de uma requisição. Neste caso, o cliente deve informar este endereço para o servidor. Pode se fazer isso:</p>
+<ul>
+<li>Via cadastro prévio junto ao servidor. Fazer desta forma, não se trafega a URL do cliente na mensagem visando mais segurança para o cliente;</li>
+<li>[Recomendada] A cada requisição via header, por exemplo,  <strong>[Empresa]-Callback</strong>. Com a vantagem de poder alterar a URL dinamicamente, criando uma por requisição;</li>
+<li>A cada requisição via body, por exemplo,  <strong>&quot;callbackUrl&quot;:</strong>. Com a desvantagem de misturar informações técnicas da comunicação com as informações de negócio contidas no body e a mesma vantagem acima;</li>
+<li>A cada requisição via querystring, por exemplo,  <strong>?callbackUrl=</strong>. Com a desvantagem de trafegar esta URL do cliente de informação de forma aberta e as mesmas vantagens acima;</li>
+</ul>
+<p>A implementação do callback é semelhante à do início deste capítulo com alguns detalhes a mais no fluxo:</p>
+<p>1 - Preferencialmente, o cliente pré-cadastra a parte não dinâmica da a URL de callback junto ao servidor que fornece as informações via API. Ex: <a href="https://api.cliente.com/contas-callback;">https://api.cliente.com/contas-callback;</a></p>
+<p>2 - Antes de fazer a requisição para o processamento assíncrono, o cliente gera um ID, por exemplo: <strong>hg87p43XmDA</strong>, referente à requisição e armazena no seu repositório;</p>
+<p>3 - Ao fazer a requisição, envia via header <strong>EmpresaExemplo-Callback</strong> a URL para o callback com o ID gerado: **EmpresaExemplo-Callback: <a href="https://api.cliente.com/contas-callback/hg87p43XmDA**;">https://api.cliente.com/contas-callback/hg87p43XmDA**;</a></p>
 <p>Ex:</p>
 <p><em>Request</em></p>
 <p>POST  <a href="http://api.exemplo.com/contas/v1/contas">http://api.exemplo.com/contas/v1/contas</a></p>
-<p>EmpresaExemplo-Callback: <a href="http://api.clienteexemplo.com/contas-callback">http://api.clienteexemplo.com/contas-callback</a></p>
+<p>EmpresaExemplo-Callback: <a href="http://api.cliente.com/contas-callback/hg87p43XmDA">http://api.cliente.com/contas-callback/hg87p43XmDA</a></p>
+<p>4 - O servidor recebe a requisição e compara a parte não dinâmica da URL de callback recebida com o pré-cadastro que ele tem. Se não bater, retorna um 400 informando a insconsitência;</p>
+<p>5 - Se estiver Ok, o servidor responde a requisição, conforme o passo a passo do início deste capítulo, com um HTTP/1.1 202 Accepted e um header Location: <a href="http://api.exemplo.com/contas/v1/contas-processamento/1c89Hqm56">http://api.exemplo.com/contas/v1/contas-processamento/1c89Hqm56</a> informando onde o cliente pode consultar o processamento;</p>
 <p><em>Response</em></p>
 <p>HTTP/1.1 200 OK</p>
-<p>Location:  <a href="http://api.exemplo.com/contas/v1/contas-processamento/1">http://api.exemplo.com/contas/v1/contas-processamento/1</a></p>
+<p>Location:  <a href="http://api.exemplo.com/contas/v1/contas-processamento/1c89Hqm56">http://api.exemplo.com/contas/v1/contas-processamento/1c89Hqm56</a></p>
 <pre><code>{
    &quot;data&quot;:{
-      &quot;id&quot;:&quot;1&quot;,
+      &quot;id&quot;:&quot;1c89Hqm56&quot;,
 	  &quot;situacao&quot;: &quot;processando&quot;,
 	  &quot;TTC&quot;: &quot;2019-07-16T19:20:30.00-03:00&quot;,
       &quot;mensagens&quot;: [
@@ -1604,17 +1616,41 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
 	}
 }
 </code></pre>
-<p>O cliente pode optar por não chamar mais a API de processamento para verificar o andamento, pois o servidor enviará a resposta via POST para a URL informada pelo cliente (<a href="http://api.clienteexemplo.com/contas-callback">http://api.clienteexemplo.com/contas-callback</a>) ao término do processamento. No Body enviado para o cliente, deverá conter todas informações referentes ao processamento.</p>
+<p>6 - O cliente armazena o id recebido <strong>1c89Hqm56</strong> em seu repositório associando ao seu próprio id <strong>hg87p43XmDA</strong>;</p>
+<p>7 - Ao término do processamento, o servidor envia uma requisição para a URL de callback informando o término da execução do processamento. É recomendado que seja enviado um conjunto mínimo de informações. A ideia é que o cliente faça a consulta na URL <a href="http://api.exemplo.com/contas/v1/contas-processamento/1c89Hqm56">http://api.exemplo.com/contas/v1/contas-processamento/1c89Hqm56</a> para saber o resultado do processamento e com isso passe por todo fluxo necessário (autenticação, token etc.). A intenção é evitar que um ataque de &quot;man in the middle&quot; receba informações confidenciais enviadas à partir do servidor fornece as informações via API.</p>
+<p>Ex (servidor da API envia o request para o cliente):</p>
+<p><em>Request</em></p>
+<p>POST <a href="https://api.cliente.com/contas-callback/hg87p43XmDA">https://api.cliente.com/contas-callback/hg87p43XmDA</a></p>
+<pre><code>{
+   &quot;id&quot;: &quot;1c89Hqm56&quot;,
+   &quot;status&quot;: &quot;finalizado&quot;
+}
+</code></pre>
+<p>7 - O cliente confere se o id do processamento informado pelo do servidor da API <strong>1c89Hqm56</strong> está relacionado com o seu próprio ID criado para a URL de callback <strong>hg87p43XmDA</strong> (lembra do passo 6?), se sim faz a requisição na URL de acompanhamento <a href="http://api.exemplo.com/contas/v1/contas-processamento/1c89Hqm56">http://api.exemplo.com/contas/v1/contas-processamento/1c89Hqm56</a> e prossegue como acontece no fluxo de pooling explicado no começo deste capítulo.</p>
+<p><em>Response</em></p>
+<p>HTTP/1.1 204 No Content</p>
+<p>Observações:</p>
+<ul>
+<li><p>No fluxo acima, talvez alguns controles de ID gerados e armazenados por parte do cliente, talvez não sejam implementados (dependendo de restrições do seu cliente) e o processo por parte de quem fornece a API pode ser flexível para aceitar isso.</p>
+</li>
+<li><p>Se o cliente não tem capacidade de implementar uma URL de callback, ele ainda assim pode fazer as consultas via pooling, pois o fluxo da URL de callback não inviabiliza a implementação da abordagem via pooling.</p>
+</li>
+<li><p>Para o cliente, se o envio da resposta via URL de callback demorar mais do que o TTC (time to complete) informado na primeira requisição, ele tem a liberdade de fazer a consulta na URL de processamento para ver o andamento da solicitação. Assim, existe um controle dos dois lados: o servidor sempre &quot;tenta&quot; informar a finalização de um processamento, mas no caso de insucesso, o cliente pode ativamente fazer a consulta.</p>
+</li>
+</ul>
 <p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
 <h2 id="processamento-em-lotes"><a id="processamento-em-lotes"></a>Processamento em lotes</h2>
-<p>Hoje existem ferramentas que permitem alta performance para atender grandes volumes de requisições online, sem a necessidade de precisar acumular requisições para processar de uma só vez. Quando se fala em REST API, normalmente busca-se este cenário de processamento em tempo real. No entanto, principalmente em REST APIs de uso interno, existem situações onde o processamento é feito em lotes. Neste cenário, pode-se seguir o seguinte padrão:</p>
+<p>Hoje existem ferramentas que permitem alta performance para atender grandes volumes de requisições online, sem a necessidade de precisar acumular requisições para processar de uma só vez. Quando se fala em REST API, normalmente busca-se este cenário de processamento em tempo real. No entanto, principalmente em REST APIs de uso interno, existem situações onde o processamento é feito em lotes.</p>
+<h3 id="url-generica-batch"><a id="url-gen&#233;rica-/batch"></a>URL genérica /batch</h3>
+<p>Pode-se definir uma URL genérica /batch que processa as chamadas em lote para qualquer URL da sua API.</p>
+<p>Neste cenário, pode-se seguir o seguinte padrão:</p>
 <ol>
 <li>O cliente define um array de objetos, sendo cada deles um request HTTP declarado com todos os seus componentes (incluindo URL, verbos e headers);</li>
 <li>O cliente submete o array mensagem para o servidor usando o verbo POST para um recurso de API preparado para receber a requisição do passo 1;</li>
 </ol>
 <p>Ex:</p>
 <p><em>Request</em></p>
-<p>POST .../batch</p>
+<p>POST /batch</p>
 <p>Content-Type: application/json</p>
 <pre><code>{
 &quot;requests&quot;:[
@@ -1679,6 +1715,22 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
    ]
 }
 </code></pre>
+<h3 id="url-especifica-batch"><a id="url-espec&#237;fica-/batch"></a>URL específica /batch</h3>
+<p>A principal característica da abordagem anterior é ser genérica para todo o domínio da API. No entanto, às vezes o processamento em lote é para apenas um conjunto de URLs que representa um determinado recurso.</p>
+<p>Neste caso, pode-se criar um sub-recurso /batch aninhado com o recurso desejado para receber este tipo de requisição. Ex:</p>
+<p>Requisições em lote:</p>
+<ul>
+<li>POST <a href="http://api.meubanco.com/cobranca/v1/boletos/batch">http://api.meubanco.com/cobranca/v1/boletos/batch</a> (cria, consulta ou apaga n boletos ao mesmo tempo)</li>
+</ul>
+<p>Requisições unitárias:</p>
+<ul>
+<li>POST <a href="http://api.meubanco.com/cobranca/v1/boletos">http://api.meubanco.com/cobranca/v1/boletos</a> (cria 1 boleto)</li>
+<li>DELETE <a href="http://api.meubanco.com/cobranca/v1/boletos/123">http://api.meubanco.com/cobranca/v1/boletos/123</a> (apaga 1 boleto)</li>
+<li>GET <a href="http://api.meubanco.com/cobranca/v1/boletos?vencimento=2020-04">http://api.meubanco.com/cobranca/v1/boletos?vencimento=2020-04</a> (consulta alguns boletos com um filtro)</li>
+<li>GET <a href="http://api.meubanco.com/cobranca/v1/boletos/123">http://api.meubanco.com/cobranca/v1/boletos/123</a> (consulta 1 boleto)</li>
+</ul>
+<p>O payload da requisição em batch segue igual ao do exemplo anterior. Talvez possa não fazer sentido repetir url, method e headers, caso sua primeira implementação de batch faça apenas criações (verbo POST em uma única URL). No entanto, manter a estrutura com todos os atributos permite que a API evolua e possa acrescentar no futuro capacidade de fazer consultas (verbo GET com n URLs diferentes), apagar (verbo DELETE com n URLs diferentes) e edição (verbo PUT/PATCH com n URLs diferentes).</p>
+<p>A vantagem de fazer o batch como sub-recurso de um recurso principal é ter um controle mais fino de acesso, token, cotas, throttling, documentação, tamanho do payload etc.</p>
 <p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
 <h2 id="recursividade"><a id="recursividade"></a>Recursividade</h2>
 <p>Existem casos em que os recursos da API podem se aninhar recursivamente.
@@ -2004,7 +2056,7 @@ Fulano de Tal
 <p>Content-Type: application/pdf</p>
 <pre><code>[binary-content]
 </code></pre>
-<p>Se quiser ver um exemplo em .NET Core para responder mais de um tipo de MIME Type, consulte este <a href="https://gist.github.com/oliveira-michel/b3ff3face96202a7ba44d6825ffec1a2">gist</a>.</p>
+<p>Se quiser ver um exemplo em .NET Core para responder mais de um tipo de MIME Type, consulte este <a href="https://gist.github.com/oliveira-michel/b3ff3face96202a7ba44d6825ffec1a2">gist</a>. Para ver como se consome uma API que expõe arquivo binário em .NET Core, consulte este <a href="https://gist.github.com/oliveira-michel/0ac3409e4912b2cff5aa92d9e0e63fc7">gist</a>. Para ver como enviar arquivos em uma API que recebe multipart/form-data, consulte este <a href="https://gist.github.com/oliveira-michel/c2833f330c0cf51eabb7ca7c698646cf">gist</a>.</p>
 <p><sub>ir para: <a href="#conte%C3%BAdo">índice</a></sub></p>
 <h2 id="seguranca"><a id="seguran&#231;a"></a>Segurança</h2>
 <p>TO DO: Aguarde! Este capítulo será escrito em breve. :-)</p>
@@ -2016,7 +2068,7 @@ Fulano de Tal
 <p>Quase tudo em REST abre discussões sobre estar mais aderente ou menos a um modelo que é &quot;vago&quot; em vários pontos. Por um lado dá liberdade para evolução de acordo com as necessidades do mercado, por outro, quando você olha o StackOverflow e concorda com as n respostas diferentes para a mesma pergunta, você conclui que o importante é adotar um padrão que faça sentido para sua empresa. Certo ou errado, seguir um padrão é muito melhor do que não seguir nenhum.</p>
 <p>A busca deve ser sempre em buscar o RESTful, no entanto, no meio do caminho vai ser normal entregar algumas APIs &quot;quase REST&quot; que adotam a maioria dos padrões mas abandona alguns em prol de timing de projeto, economia de recursos ou satisfação do cliente.</p>
 <p>Alguns destes padrões que abandonamos podem não fazer falta e não fará o desenvolvedor passar vergonha ao dizer que fez uma API REST, mas não implementou o HTTP Status Code A ou B; ou talvez não implementou HATEOAS em todas as APIs; ou não implementou paginação em alguma delas. No entanto, alguns anti-patterns são praticamente inadimissíveis, como usar somente o verbo POST para resolver todos os problemas; ignorar os comportamentos de idempotência e segurança; limitar a resposta a 200 para Ok e 500 para todo o resto sem nenhum detalhe adicional ... enfim, o recado é que busquem sempre entregar o melhor contrato possível.</p>
-<p>E com a prática, percebe-se que tudo isso aqui é muito simples, pois é técnico, é mais &quot;preto no branco&quot;. O real desafio estará em modelar o negócio, entender como ele é e representá-lo bem através de URLs e Atributos. Mas isto é assunto pra um outro guia.</p>
+<p>E com a prática, percebe-se que tudo isso aqui é muito simples, pois é técnico, é mais &quot;preto no branco&quot;. O real desafio estará em modelar o negócio, entender como ele é e representá-lo bem através de URLs e Atributos e isso você encontra nesse <a href="https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/guia.md">guia</a>.</p>
 </div>
 </body>
 </html>
