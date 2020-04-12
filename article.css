@@ -25,7 +25,7 @@ div.content h1:first-of-type {
 
 @media screen and (max-width: 1007px) {
     div.content h1:first-of-type {
-        background-position: 0px calc(100% - 200px);
+        background-position: 0px calc(100% - 60px);
         background-size: 100% ;
 
         padding-left: 30px;
