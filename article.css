@@ -4,7 +4,7 @@ div.content {
 }
 
 div.content h1:first-of-type {
-    background-position: 300px calc(100% - 200px);
+    background-position: 300px calc(50% - 200px);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: calc(100% - 300px);
@@ -25,11 +25,22 @@ div.content h1:first-of-type {
 
 @media screen and (max-width: 1007px) {
     div.content h1:first-of-type {
-        background-position: 0px calc(100% - 60px);
-        background-size: 100% ;
+        background-position: 0px calc(100% - 260px); /* 200 do h1 + 60 da linha de header*/
+        background-size: 100%;
 
-        padding-left: 30px;
+        padding-left: 20px;
         line-height: 80px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    div.content h1:first-of-type {
+        background-position: 0px 60px;
+        background-size: 100%;
+
+        padding-left: 10px;
+        line-height: 60px;
+        font-size: 24px;
     }
 }
 
