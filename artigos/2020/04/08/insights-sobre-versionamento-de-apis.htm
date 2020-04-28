@@ -42,10 +42,13 @@
             <div class="home">
                 <a href="../../../../index.htm" class="active">Home</a>
             </div>
-            <div class="hashTags"><a href='../../../../index.htm#rest' onclick="filterHashTag('rest')">#rest</a></div>
+            <div class="hashTags"><a href='../../../../index.htm#.net' onclick="filterHashTag('.net')">#.net</a>
+<a href='../../../../index.htm#rest' onclick="filterHashTag('rest')">#rest</a>
+<a href='../../../../index.htm#web' onclick="filterHashTag('web')">#web</a></div>
         </div>
     </div>
-    <div class="content"><div class="imageHeader" class="imageHeader" style="background-image: url('header-rest-preto.jpg')"></div><h1 id="insights-sobre-versionamento-de-apis"><a id="insights-sobre-versionamento-de-apis"></a>Insights sobre versionamento de APIs</h1>
+    <div class="content">
+<div class="imageHeader" style="background-image: url('header-rest-preto.jpg')"></div><h1 id="insights-sobre-versionamento-de-apis"><a id="insights-sobre-versionamento-de-apis"></a>Insights sobre versionamento de APIs</h1>
 <p>Neste artigo, faço uma pesquisa sobre como algumas das principais APIs do mercado tratam o assunto versionamento. Para conhecer alguns conceitos básicos sobre versionamento, recomendo primeiro a leitura do capítulo sobre versionamento no <a href="https://oliveira-michel.github.io/artigos/2019/07/11/guia-de-design-rest.htm">Guia de Design REST</a>.</p>
 <p>No quadro abaixo, listo algumas APIs independente do segmento, idade, qualidade da modelagem ou aderência ao REST. Observe como cada uma das empresas optou por versionar suas APIs.</p>
 <table subscriptionid="" resourcegroupname="" servername="" databasename="" projectid="">
@@ -140,13 +143,13 @@
 </tbody>
 </table>
 <p>Com base no quadro acima, podemos observar alguns pontos:</p>
-<h4 id="preferencia-por-path-parameter-e-query-parameter"><strong><a id="prefer&#234;ncia-por-path-parameter-e-query-parameter"></a>Preferência por path parameter e query parameter</strong></h4>
+<h4 id="preferencia-por-path-parameter-e-query-parameter"><a id="prefer&#234;ncia-por-path-parameter-e-query-parameter"></a><strong>Preferência por path parameter e query parameter</strong></h4>
 <p>Apesar de ter buscado por APIs diversas, nenhuma delas optou pelo versionamento via <a href="https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md#versionamento-pelo-host">host</a> ou <a href="https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md#versionamento-por-header-customizado">header</a>. O Vimeo foi o único a adotar a abordagem com <a href="https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md#versionamento-pelo-content-type-com-o-header-accept">content-type</a>. A preferência geral foi por utilizar path parameter (na estrutura da URL) ou passar como query parameter.</p>
-<h4 id="foram-utilizadas-major-somente-major.minor-e-datas"><strong><a id="foram-utilizadas-major-somente-major.minor-e-datas"></a>Foram utilizadas Major somente, Major.Minor e datas</strong></h4>
+<h4 id="foram-utilizadas-major-somente-major.minor-e-datas"><a id="foram-utilizadas-major-somente-major.minor-e-datas"></a><strong>Foram utilizadas Major somente, Major.Minor e datas</strong></h4>
 <p>Em ordem crescente, as empresas preferiram optar por versionar considerando apenas o Major, Major.Minor e uma minoria com data.</p>
-<h4 id="adotam-uma-unica-forma-de-versionar"><strong><a id="adotam-uma-&#250;nica-forma-de-versionar"></a>Adotam uma única forma de versionar</strong></h4>
+<h4 id="adotam-uma-unica-forma-de-versionar"><a id="adotam-uma-&#250;nica-forma-de-versionar"></a><strong>Adotam uma única forma de versionar</strong></h4>
 <p>A maioria optou por um único ponto para versionar a API (path parameter ou query). Apenas a API do Four Square que optou por colocar a Major na URL e opcionalmente, uma versão específica via query string.</p>
-<h4 id="algumas-enderecaram-versoes-preview-beta-e-builds-recorrentes"><strong><a id="algumas-endere&#231;aram-vers&#245;es-preview-beta-e-builds-recorrentes"></a>Algumas endereçaram versões preview, beta e builds recorrentes</strong></h4>
+<h4 id="algumas-enderecaram-versoes-preview-beta-e-builds-recorrentes"><a id="algumas-endere&#231;aram-vers&#245;es-preview-beta-e-builds-recorrentes"></a><strong>Algumas endereçaram versões preview, beta e builds recorrentes</strong></h4>
 <p>Apesar de menos frequente, algumas strings de versionamento endereçam builds recorrentes, como <em>weekly</em>, <em>quarterly</em> como na Google Maps em Javascript; <em>v1beta1</em> na Google Datastore e <em>2017-10-01-preview</em> na Azure Sql Databases.</p>
 <h3 id="e-o-oscar-vai-para-versao-major-na-url"><a id="e-o-oscar-vai-para-&amp;quot;vers&#227;o-major-na-url&amp;quot;"></a>E o Oscar vai para &quot;versão MAJOR na URL&quot;</h3>
 <p>Quando falamos <a href="https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md#versionamento">versionamento semântico</a>, alterações em Minor e Path não devem fazer com que quem já consome a versão tenha qualquer problema por quebra de contrato, ou seja, nenhum campo não obrigatório passa a ser obrigatório e nenhum campo é removido. Neste tipo de alteração, são apenas adicionados novos campos ou feitas alterações em metadados. Assim, pequenas evoluções podem ser feitas na API e notificadas aos desenvolvedores, no entanto, sem demandar que atualizações sejam obrigatoriamente feitas nos seus clientes.</p>
@@ -249,6 +252,7 @@
 <h3 id="conclusao"><a id="conclus&#227;o"></a>Conclusão</h3>
 <p>Sobre Open Banking, penso no cliente que é um APP e precisará acessar ao mesmo tempo 'n' implementações de bancos diferentes. Acredito que ele prefira a flexibilidade de implementar uma única vez a capacidade de ler a nova versão e colher os benefícios de novos atributos o quanto antes, independente de os seus vários fornecedores de informação já estarem preparados para disponibilizá-las. Por isso, gosto da abordagem 3, que me parece atender a qualquer um dos cenários. Inclusive daquele que optar por aguardar todos os fornecedores disponibilizarem a versão nova.</p>
 <p>Sobre os modelos de versionamento de forma geral, talvez com um número bem maior de APIs, outros insights poderiam ter aparecido, no entanto, não me surpreendeu que após este pequeno o levantamento, não tenha aparecido nada de muito novo, senão o que já é recorrente em guias de boas práticas. Ou seja, já existe uma convergência no mercado para alguns modelos principais.</p>
+
 </div>
 </body>
 </html>

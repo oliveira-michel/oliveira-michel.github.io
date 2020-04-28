@@ -42,14 +42,17 @@
             <div class="home">
                 <a href="../../../../index.htm" class="active">Home</a>
             </div>
-            <div class="hashTags"><a href='../../../../index.htm#rest' onclick="filterHashTag('rest')">#rest</a></div>
+            <div class="hashTags"><a href='../../../../index.htm#.net' onclick="filterHashTag('.net')">#.net</a>
+<a href='../../../../index.htm#rest' onclick="filterHashTag('rest')">#rest</a>
+<a href='../../../../index.htm#web' onclick="filterHashTag('web')">#web</a></div>
         </div>
     </div>
-    <div class="content"><div class="imageHeader" class="imageHeader" style="background-image: url('header-rest-branco.jpg')"></div><h1 id="guia-de-design-rest"><a id="guia-de-design-rest"></a>Guia de Design REST</h1>
-<h2 id="abstract"><em><a id="abstract"></a>Abstract</em></h2>
+    <div class="content">
+<div class="imageHeader" style="background-image: url('header-rest-branco.jpg')"></div><h1 id="guia-de-design-rest"><a id="guia-de-design-rest"></a>Guia de Design REST</h1>
+<h2 id="abstract"><a id="abstract"></a><em>Abstract</em></h2>
 <p><em>This document is a guideline for REST API designing based on the best practices and experiences from author who headed some REST API service governance projects in the banking environment. REST API is an architectural style used to expose services on the web.</em></p>
 <p>Este documento é guia para design de REST API com base em melhores práticas e experiências do autor que liderou alguns projetos de governança de serviços com REST API em ambiente bancário. REST API é um estilo arquitetural usado para expor serviços na web.</p>
-<h2 id="status-of-this-document"><em><a id="status-of-this-document"></a>Status of this document</em></h2>
+<h2 id="status-of-this-document"><a id="status-of-this-document"></a><em>Status of this document</em></h2>
 <p><em>This is an &quot;alive&quot; document where the author is updating with day-by-day experience. Therefore, it may never arrive in its final version. However, the published content already accumulates project experiences that totaled a few hundred REST APIs.</em></p>
 <p>Este é um documento &quot;vivo&quot; em que o autor está atualizando com a experiência do dia a dia. Portanto, nunca pode chegar em sua versão final. No entanto, o conteúdo publicado já acumula experiências de projetos que totalizaram algumas centenas de REST APIs.</p>
 <h2 id="conteudo"><a id="conte&#250;do"></a>Conteúdo</h2>
@@ -2079,6 +2082,7 @@ Fulano de Tal
 <p>A busca deve ser sempre em buscar o RESTful, no entanto, no meio do caminho vai ser normal entregar algumas APIs &quot;quase REST&quot; que adotam a maioria dos padrões mas abandona alguns em prol de timing de projeto, economia de recursos ou satisfação do cliente.</p>
 <p>Alguns destes padrões que abandonamos podem não fazer falta e não fará o desenvolvedor passar vergonha ao dizer que fez uma API REST, mas não implementou o HTTP Status Code A ou B; ou talvez não implementou HATEOAS em todas as APIs; ou não implementou paginação em alguma delas. No entanto, alguns anti-patterns são praticamente inadimissíveis, como usar somente o verbo POST para resolver todos os problemas; ignorar os comportamentos de idempotência e segurança; limitar a resposta a 200 para Ok e 500 para todo o resto sem nenhum detalhe adicional ... enfim, o recado é que busquem sempre entregar o melhor contrato possível.</p>
 <p>E com a prática, percebe-se que tudo isso aqui é muito simples, pois é técnico, é mais &quot;preto no branco&quot;. O real desafio estará em modelar o negócio, entender como ele é e representá-lo bem através de URLs e Atributos e isso você encontra nesse <a href="https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/guia.md">guia</a>.</p>
+
 </div>
 </body>
 </html>
