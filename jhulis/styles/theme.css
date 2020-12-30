@@ -1,0 +1,180 @@
+.CodeMirror.cm-s-default,
+.CodeMirror.cm-s-material,
+.CodeMirror.cm-s-base16-light {
+    line-height: normal;
+    padding: 4px;
+    height: 100%;
+    width: 100%;
+}
+
+body.darktheme {
+    background-color: rgb(40, 44, 52);
+}
+
+body.darktheme .trytopnav {
+    background-color: #616161;
+    color: #dddddd;
+}
+
+body.darktheme #container {
+    background-color: #616161;
+}
+
+body.darktheme .trytopnav a {
+    color: #dddddd;
+}
+
+body.darktheme ::-webkit-scrollbar {
+    width: 12px;
+    height: 3px;
+}
+
+body.darktheme ::-webkit-scrollbar-track-piece {
+    background-color: #000;
+}
+
+body.darktheme ::-webkit-scrollbar-thumb {
+    height: 50px;
+    background-color: #616161;
+}
+
+body.darktheme ::-webkit-scrollbar-thumb:hover {
+    background-color: #aaaaaa;
+}
+
+/*DARK THEME RESULT*/
+
+body.darktheme #iframewrapper {
+    background-color: #263238;
+    color: #dddddd;
+}
+
+/*DARK THEME EDITOR*/
+body.darktheme .CodeMirror {
+    background-color: #263238;
+    color: #EEFFFF;
+}
+
+body.darktheme .cm-s-default .CodeMirror-gutters {
+    background: #263238;
+    color: #546E7A;
+    border: none;
+}
+
+body.darktheme .cm-s-default .CodeMirror-guttermarker,
+body.darktheme .cm-s-default .CodeMirror-guttermarker-subtle,
+body.darktheme .cm-s-default .CodeMirror-linenumber {
+    color: #546E7A;
+}
+
+body.darktheme .cm-s-default .CodeMirror-cursor {
+    border-left: 1px solid #FFCC00;
+}
+
+body.darktheme .cm-s-default div.CodeMirror-selected {
+    background: rgba(128, 203, 196, 0.2);
+}
+
+body.darktheme .cm-s-default.CodeMirror-focused div.CodeMirror-selected {
+    background: rgba(128, 203, 196, 0.2);
+}
+
+body.darktheme .cm-s-default .CodeMirror-line::selection,
+body.darktheme .cm-s-default .CodeMirror-line>span::selection,
+body.darktheme .cm-s-default .CodeMirror-line>span>span::selection {
+    background: rgba(128, 203, 196, 0.2);
+}
+
+body.darktheme .cm-s-default .CodeMirror-line::-moz-selection,
+body.darktheme .cm-s-default .CodeMirror-line>span::-moz-selection,
+body.darktheme .cm-s-default .CodeMirror-line>span>span::-moz-selection {
+    background: rgba(128, 203, 196, 0.2);
+}
+
+body.darktheme .cm-s-default .CodeMirror-activeline-background {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+body.darktheme .cm-s-default .cm-keyword {
+    color: #C792EA;
+}
+
+body.darktheme .cm-s-default .cm-operator {
+    color: #89DDFF;
+}
+
+body.darktheme .cm-s-default .cm-variable-2 {
+    color: #EEFFFF;
+}
+
+body.darktheme .cm-s-default .cm-variable-3,
+.cm-s-material .cm-type {
+    color: #f07178;
+}
+
+body.darktheme .cm-s-default .cm-builtin {
+    color: #FFCB6B;
+}
+
+body.darktheme .cm-s-default .cm-atom {
+    color: #F78C6C;
+}
+
+body.darktheme .cm-s-default .cm-number {
+    color: #FF5370;
+}
+
+body.darktheme .cm-s-default .cm-def {
+    color: #82AAFF;
+}
+
+body.darktheme .cm-s-default .cm-string {
+    color: #C3E88D;
+}
+
+body.darktheme .cm-s-default .cm-string-2 {
+    color: #f07178;
+}
+
+body.darktheme .cm-s-default .cm-comment {
+    color: #546E7A;
+}
+
+body.darktheme .cm-s-default .cm-variable {
+    color: #f07178;
+}
+
+body.darktheme .cm-s-default .cm-tag {
+    color: #FF5370;
+}
+
+body.darktheme .cm-s-default .cm-meta {
+    color: #FFCB6B;
+}
+
+body.darktheme .cm-s-default .cm-attribute {
+    color: #C792EA;
+}
+
+body.darktheme .cm-s-default .cm-property {
+    color: #C792EA;
+}
+
+body.darktheme .cm-s-default .cm-qualifier {
+    color: #DECB6B;
+}
+
+body.darktheme .cm-s-default .cm-variable-3,
+body.darktheme .cm-s-default .cm-type {
+    color: #DECB6B;
+}
+
+body.darktheme .cm-s-default .cm-error {
+    color: rgba(255, 255, 255, 1.0);
+    background-color: #FF5370;
+}
+
+body.darktheme .cm-s-default .CodeMirror-matchingbracket {
+    text-decoration: underline;
+    color: white !important;
+}

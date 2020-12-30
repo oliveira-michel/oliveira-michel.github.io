@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <title>Jhulis | O validador de boas práticas em REST APIs</title>
+
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+
+    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta property='og:title' content='Jhulis | O validador de boas práticas em REST APIs'/>
+    <meta property='og:image' content='https://oliveira-michel.github.io/jhulis/images/jhulis-logo-627.png'/>
+    <meta property='og:description' content='Jhulis é um projeto Open Source que valida boas práticas de modelagem de REST APIs.'/>
+    <meta property='og:url' content='https://oliveira-michel.github.io/jhulis'/>
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1747">
+    <meta property="og:image:height" content="627">
+
+    <link href='https://fonts.googleapis.com/css?family=Consolas' rel='stylesheet'>
+
+    <link rel="stylesheet" href="libs/w3css-v4/w3.css">
+    <link rel="stylesheet" href="libs/w3css-v4/w3-colors-metro.css">
+
+    <link rel="stylesheet" href="libs/codemirror/lib/codemirror.css">
+    <script src="libs/codemirror/lib/codemirror.js"></script>
+    <script src="libs/codemirror/mode/javascript/javascript.js"></script>
+    <script src="libs/codemirror/mode/yaml/yaml.js"></script>
+
+    <script src="https://kit.fontawesome.com/7a312fc647.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="styles/layout.css">
+    <link rel="stylesheet" href="styles/splitter.css">
+    <link rel="stylesheet" href="styles/theme.css">
+
+<!--[if lt IE 8]>
+<style>
+#textareacontainer, #iframecontainer {width:48%;}
+#container {height:500px;}
+#textarea, #iframe {width:90%;height:450px;}
+#textareaCode, #iframeResult {height:450px;}
+.stack {display:none;}
+</style>
+<![endif]-->
+</head>
+
+<body>
+    <div class="trytopnav">
+        <div class="w3-bar" style="overflow:auto">
+          <a href="javascript:void(0);" onclick="document.getElementById('confirmHome').style.display='block'"
+          title="Ir para a página inicial">
+            <img class="w3-bar-item" src="images/jhulis-logo-50.png" style="height: 42px;"  />
+          </a>
+            <a href="javascript:void(0);" onclick="restack(currentStack)" title="Alterar orientação dos frames"
+                class="w3-button w3-bar-item topnav-icons fa fa-sync-alt"></a>
+            <a href="javascript:void(0);" onclick="retheme()" title="Alterar tema"
+                class="w3-button w3-bar-item topnav-icons fa fa-adjust"></a>
+            <a href="javascript:void(0);" onclick="submitValidate()" title="Executar validação"
+                class="w3-button w3-bar-item topnav-icons w3-metro-yellow fas fa-check"> Validar</a>
+            <span class="w3-right w3-hide-small" style="padding:8px 8px 8px 8px;display:block"></span>
+            <span class="w3-right w3-hide-small" style="padding:8px 0;display:block;float:right;"><a
+                    href="https://github.com/oliveira-michel/jhulis"
+                    target="_blank">github.com/oliveira-michel/jhulis</a></span>
+        </div>
+    </div>
+
+    <div id="confirmHome" class="w3-modal">
+      <div class="w3-modal-content w3-card-4">
+
+        <header class="w3-container w3-metro-yellow">
+          <span onclick="document.getElementById('confirmHome').style.display='none'"
+          class="w3-button w3-display-topright w3-hide-small">&times;</span>
+          <div class="w3-padding">Resetar?</div>
+        </header>
+    
+        <div class="w3-container">
+          <p>Isto redefinirá a tela para a página inicial e limpará o seu código.</p>
+        </div>
+    
+        <footer class="w3-container">
+          <button onclick="document.getElementById('confirmHome').style.display='none'" type="button" class="w3-button">Cancel</button>
+          <button onclick="location.href='index.htm'" type="button" class="w3-button">Resetar</button>
+        </footer>
+    
+      </div>
+    </div>
+
+    <script>
+      // Get the modal
+      var modal = document.getElementById('confirmHome');
+
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+    </script>
+
+
+    <div id="shield"></div>
+
+    <a href="javascript:void(0)" id="dragbar"></a>
+    <div id="container">
+        <div id="menuOverlay" class="w3-overlay w3-transparent" style="cursor:pointer;z-index:4"></div>
+        <div id="textareacontainer">
+            <div id="textarea">
+                <div id="textareawrapper">
+                    <textarea autocomplete="off" id="textareaCode" wrap="logical" spellcheck="false">openapi: 3.0.0
+info:
+  title: Cole aqui neste editor seu seu contrato válido de API escrito em JSON ou YAML em Open API Specification.
+  description: Em seguida, clique no botão Validar para verificar quais boas práticas você pode adotar no seu contrato.
+  version: "1.0.0"
+servers:
+  - url: http://api.exemplo.com/v1
+    description: Servidor de exemplo
+paths:
+  /usuarios:
+    get:
+      summary: Apenas como exemplo, representa a coleção de usuários.
+      responses:
+        '200':
+          description: Apenas como exemplo, retorna um array de usuários.
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  type: string</textarea>
+                </div>
+            </div>
+        </div>
+        <div id="iframecontainer">
+            <div id="iframe">
+                <div id="iframewrapper" class="w3-padding-small">
+                  <div>
+                    <h3>Sobre</h3>
+                    <p>Jhulis é um projeto Open Source que valida boas práticas de modelagem de REST APIs.</p>
+                    <h3>Instruções</h3>
+                    <p>Cole no editor o seu contrato em Open API Specification v1, 2 ou 3.</p>
+                    <p>Clique no botão Validar e analise quais regras o Jhulis retornou como sugestão de melhoria para o seu contrato.</p>
+                    <p>Faça os ajustes necessários e valide novamente.</p>
+                    <p>Este editor não visa ser utilizado em ambientes produtivos. O objetivo dele é ajudar o desenvolvedor a entender e testar o funcionamento do Jhulis.</p>
+                    <p>Para conhecer mais sobre o Jhulis, leia a <a href="https://github.com/oliveira-michel/jhulis" target="_blank">documentação do sistema.</a></p>
+                    <h3>Política de privacidade</h3>
+                    <p>Os dados das requisições podem ser armazenados por tempo limitado no servidor visando exclusivamente log para melhorias sistêmicas e análises de bug, sendo descartados em caso de não utilização. O armazenamento do contrato, assim como preferências do editor, também podem ocorrer na máquina do usuário no cache do navegador. Portanto, em caso de contratos com informações confidencias, lembre-se de limpar o cache do navegador.</p>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/retheme.js"></script>
+    <script src="scripts/editor.js"></script>
+    <script src="scripts/layout.js"></script>
+    <script src="scripts/validate.js"></script>
+
+</body>
+
+ <!-- Global site tag (gtag.js) - Google Analytics -->
+ <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-163804196-1"></script>
+ <script>
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
+
+ gtag('config', 'UA-163804196-1');
+ </script>
+
+</html>
