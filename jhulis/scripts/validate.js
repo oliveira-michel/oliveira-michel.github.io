@@ -2,19 +2,29 @@ function submitValidate() {
 
     var text = editor.getValue();
     var httpClient = new XMLHttpRequest();
-    httpClient.open("POST", "https://api-jhulis.azurewebsites.net/jhulis/v0/validate", true);
+    httpClient.open("POST", jhulisApiEndpoint + "/validate", true);
     httpClient.setRequestHeader("Accept", "application/json");
     httpClient.setRequestHeader("Content-Type", "text/plain");
 
     httpClient.onreadystatechange = function() {
          if(httpClient.readyState == 4 /*&& httpClient.status == 200*/) {
-            //  document.getElementById("iframewrapper").innerHTML = formatValidationResult(httpClient.responseText);
-
             formatValidationResult(httpClient.responseText);
+         } else {
+            showLoading();
          }
     }
 
     httpClient.send(text);   
+}
+
+function showLoading() {
+    document.getElementById("iframewrapper").innerHTML = "";
+    
+        var loadImage = document.createElement("img");
+            loadImage.setAttribute("src", "images/loading-block-dots.gif");
+            loadImage.setAttribute("style", "height: 6px;");
+    
+    document.getElementById("iframewrapper").appendChild(loadImage);
 }
 
 function formatValidationResult(result) {
