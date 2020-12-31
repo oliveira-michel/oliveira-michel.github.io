@@ -1,1 +1,0 @@
-const jhulisApiEndpoint = "https://api-jhulis.azurewebsites.net/jhulis/v0";

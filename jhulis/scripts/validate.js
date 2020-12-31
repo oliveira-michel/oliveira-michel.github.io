@@ -2,7 +2,7 @@ function submitValidate() {
 
     var text = editor.getValue();
     var httpClient = new XMLHttpRequest();
-    httpClient.open("POST", jhulisApiEndpoint + "/validate", true);
+    httpClient.open("POST", "https://api-jhulis.azurewebsites.net/jhulis/v0/validate", true);
     httpClient.setRequestHeader("Accept", "application/json");
     httpClient.setRequestHeader("Content-Type", "text/plain");
 
