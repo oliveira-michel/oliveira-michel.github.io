@@ -1,5 +1,6 @@
 function submitValidate() {
 
+    showLoading();
     var text = editor.getValue();
     var httpClient = new XMLHttpRequest();
     httpClient.open("POST", "https://api-jhulis.azurewebsites.net/jhulis/v0/validate", true);
