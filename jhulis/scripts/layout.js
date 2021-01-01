@@ -51,12 +51,14 @@ function restack(horizontal) {
         document.getElementById("textareacontainer").style.width = "100%";
         document.getElementById("iframecontainer").style.width = "100%";
         currentStack = false;
+        localStorage.setItem("orientation", "horizontal");
     } else {
         document.getElementById("textareacontainer").style.height = "100%";
         document.getElementById("iframecontainer").style.height = "100%";
         document.getElementById("textareacontainer").style.width = "50%";
         document.getElementById("iframecontainer").style.width = "50%";
         currentStack = true;
+        localStorage.setItem("orientation", "vertical");
     }
     fixDragBtn();
 }
@@ -150,3 +152,6 @@ function w3_getStyleValue(elmnt, style) {
         return elmnt.currentStyle[style];
     }
 }
+
+//Ao carregar a página, define a orientação já gravada previamente.
+if (localStorage.getItem("orientation") == "horizontal") restack(true);

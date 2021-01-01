@@ -3,10 +3,13 @@ function retheme() {
     if (cc.indexOf("darktheme") > -1) {
         document.body.className = cc.replace("darktheme", "");
         if (opener) { opener.document.body.className = cc.replace("darktheme", ""); }
-        localStorage.setItem("preferredmode", "light");
+        localStorage.setItem("theme", "light");
     } else {
         document.body.className += " darktheme";
         if (opener) { opener.document.body.className += " darktheme"; }
-        localStorage.setItem("preferredmode", "dark");
+        localStorage.setItem("theme", "dark");
     }
 }
+
+//Ao carregar a página, define o tema já gravado previamente.
+if (localStorage.getItem("theme") == "dark") retheme();
