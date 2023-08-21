@@ -252,7 +252,7 @@ Mas o ponto principal é que normalmente é utilizada uma URL diferente da URL d
 <li>Endereço da representação de um recurso chamado &quot;tracks&quot; de um &quot;album&quot; específico do Spotify: <a href="https://api.spotify.com/v1/albums/%7Bid%7D/tracks">https://api.spotify.com/v1/albums/{id}/tracks</a></li>
 </ul>
 <p>Repare que existe um Base Path se repetindo em cada um dos endereços (<a href="https://api.spotify.com">https://api.spotify.com</a>) e um &quot;/v1&quot; também. Ele representa a versão da API e também é exposto como um recurso. Há mais informações sobre versionamento no capítulo <a href="#versionamento">Versionamento</a>.</p>
-<p id="">Observe que algumas URLs têm recursos como artists ou albums que não têm o {id} na frente. Elas deverão retornar listas, pois não se especifica nenhum &quot;artist&quot; ou &quot;album&quot; específico através de um . Outras URLs têm o  e retornarão apenas um item cujo id seja o id definido naquela URL. Este  é um <a href="#request--url--resources--path-parameters">Path Parameter</a>.</p>
+<p id="">Observe que algumas URLs têm recursos como artists ou albums que não têm o %7Bid%7D na frente. Elas deverão retornar listas, pois não se especifica nenhum &quot;artist&quot; ou &quot;album&quot; específico através de um . Outras URLs têm o  e retornarão apenas um item cujo id seja o id definido naquela URL. Este  é um <a href="#request--url--resources--path-parameters">Path Parameter</a>.</p>
 <p>Apenas para mais referências, seguem outros exemplos de mercado. Observe como os recursos se &quot;anhinham&quot; através das URLs:</p>
 <ul>
 <li>Endereço da lista de comentários de uma tarefa específica no jBPM da RedHat: https:///server/containers//tasks//comments</li>
